@@ -1,0 +1,109 @@
+/* Estilos para WeatherCards.jsx — fiel al CodePen original, adaptado a tus variables de tema */
+
+.weather-error {
+  margin: -6px 0 14px;
+  color: #e08a8a;
+  font: 0.75rem var(--mono);
+}
+.weather-city {
+  display: block;
+  color: inherit;
+  opacity: 0.75;
+  font-size: 0.78rem;
+  margin-bottom: 2px;
+}
+
+.weather-demo {
+  position: relative;
+  padding: 24px 24px 20px;
+  overflow: hidden;
+  border: 1px solid rgba(168, 173, 181, 0.2);
+  background: linear-gradient(155deg, rgba(65, 72, 84, 0.6), rgba(11, 12, 14, 0.45));
+}
+
+.weather-card {
+  height: 330px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+  background-color: #DAE3FD;
+  transition: background-color 2s ease;
+}
+
+/* estados de fondo por tipo (la clase la pone JS en .weather-demo) */
+.weather-demo.thunder .weather-card { background-color: #9FA4AD; }
+.weather-demo.rain .weather-card    { background-color: #D8D8D8; }
+.weather-demo.sun .weather-card     { background-color: #ccccff; }
+.weather-demo.snow .weather-card    { background-color: #DAE3FD; }
+.weather-demo.wind .weather-card    { background-color: #DAE3FD; }
+.weather-demo.night .weather-card   { background-color: #26354f; }
+
+.weather-card svg {
+  background: linear-gradient(to bottom, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+}
+
+.wc-cloud { transition: fill 2s ease; }
+.wc-cloud-1 { fill: #efefef; }
+.wc-cloud-2 { fill: #E6E6E6; }
+.wc-cloud-3 { fill: #D5D5D5; }
+.weather-demo.thunder .wc-cloud-1 { fill: #9FA4AD; }
+.weather-demo.thunder .wc-cloud-2 { fill: #8B8E98; }
+.weather-demo.thunder .wc-cloud-3 { fill: #7B7988; }
+.weather-demo.night .wc-cloud-1 { fill: #52627c; }
+.weather-demo.night .wc-cloud-2 { fill: #465670; }
+.weather-demo.night .wc-cloud-3 { fill: #394963; }
+
+.weather-details {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 16px 20px;
+  color: #888;
+  display: flex;
+  justify-content: space-between;
+  transition: color 2s ease;
+  z-index: 3;
+}
+.weather-demo.thunder .weather-details { color: #ddd; }
+.weather-demo.night .weather-details { color: #f1f3f7; }
+
+.weather-bio {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 18px 20px;
+  z-index: 3;
+  color: #888;
+  transition: color 2s ease;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.15), transparent 70%);
+}
+.weather-demo.thunder .weather-bio { color: #ddd; }
+.weather-demo.night .weather-bio { color: #f1f3f7; }
+
+.weather-bio-eyebrow {
+  margin: 0 0 6px;
+  font-weight: 700;
+  font-size: 2rem;          /* ajusta aquí el tamaño */
+  line-height: 1.1;         /* con letras grandes conviene un line-height más cerrado */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.weather-bio-intro {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.weather-copy { text-align: right; }
+.weather-copy time { display: block; margin: 4px 0; }
+.weather-copy strong { display: block; font-weight: 600; font-size: 22px; }
+
+.weather-temperature { font-size: 60px; line-height: 60px; }
+.weather-temperature span {
+  font-size: 18px;
+  line-height: 30px;
+  vertical-align: top;
+  margin-left: 5px;
+}
+
