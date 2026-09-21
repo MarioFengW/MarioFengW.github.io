@@ -67,7 +67,7 @@ export const projects = [
   },
   {
     title: 'In & Out',
-    period: 'Aug 2025 - Oct 2025',
+    period: 'Aug 2025 - Dec 2025',
     context: 'Cybersecurity & Software System',
     description: 'Digital transformation platform for Banco de Alimentos Jalisco, coordinating donors, drivers and admins with real-time state tracking and vehicle matching.',
     stack: ['React Native', 'TypeScript', 'Supabase'],
@@ -75,10 +75,18 @@ export const projects = [
   },
   {
     title: 'Connect the Schools',
-    period: 'Feb 2025 - May 2025',
+    period: 'Feb 2025 - Jun 2025',
     context: 'Software Construction',
     description: 'Educational support platform connecting 3,000+ schools with partners through similarity-based needs matching.',
     stack: ['React', 'Node.js', 'PostgreSQL'],
     link: 'https://github.com/JRV-XVI/connect-the-schools'
+  },
+  {
+    title: 'Hack2Dawn',
+    period: 'Feb 2025 - May 2025',
+    context: 'PawnGuard Capture The Flag',
+    description: 'Hack2Dawn is a Capture The Flag (CTF) cybersecurity competition where participants face challenges in web exploitation, reverse engineering, and cryptography. Analyze, exploit, and capture the flags before anyone else.',
+    stack: ['React', 'Next.js', 'TailwindCSS', 'TypeScript'],
+    link: 'https://hack.pawnguard.org'
   },
 ];
