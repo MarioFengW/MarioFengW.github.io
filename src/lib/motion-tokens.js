@@ -27,7 +27,9 @@ export const motionTokens = {
     type: 0.07, // typewriter, per character
     list: 0.08, // list items (0.05–0.10 range)
   },
-  viewportMargin: '-80px',
+  // Vertical only: shrinking the viewport sideways too would make narrow
+  // screens miss elements that are plainly on screen.
+  viewportMargin: '-80px 0px',
 };
 
 export const springs = {

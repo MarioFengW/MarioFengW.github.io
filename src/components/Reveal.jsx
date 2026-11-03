@@ -41,21 +41,23 @@ export function RevealItem({ as = 'li', children, ...rest }) {
   );
 }
 
-/** The `+-----` rule under a heading draws itself left to right once in view. */
+/**
+ * The `+-----` rule under a heading draws itself left to right. It follows its
+ * parent's `hidden`/`visible` variants (SectionHeading), so it is never itself
+ * an observed, fully clipped target.
+ */
 export function DrawRule({ className = 'ascii-rule' }) {
   const reduced = useReducedMotion();
-  return (
-    <m.span
-      className={className}
-      aria-hidden="true"
-      data-reveal=""
-      initial={{ clipPath: 'inset(0 100% 0 0)' }}
-      whileInView={{ clipPath: 'inset(0 0% 0 0)' }}
-      viewport={viewport}
-      transition={{
+  const variants = {
+    hidden: { clipPath: 'inset(0 100% 0 0)' },
+    visible: {
+      clipPath: 'inset(0 0% 0 0)',
+      transition: {
         duration: reduced ? 0 : motionTokens.duration.slow,
+        delay: reduced ? 0 : motionTokens.duration.fast,
         ease: motionTokens.easing.out,
-      }}
-    />
-  );
+      },
+    },
+  };
+  return <m.span className={className} aria-hidden="true" data-reveal="" variants={variants} />;
 }

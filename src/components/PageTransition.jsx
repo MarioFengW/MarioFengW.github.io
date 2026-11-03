@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { gridSize, wipeFrame } from '../lib/ascii';
+import { wipeFrame } from '../lib/ascii';
 import { easeOutCubic, motionTokens } from '../lib/motion-tokens';
 import useReducedMotion from '../hooks/useReducedMotion';
+import { measureGrid } from '../hooks/useAsciiLoop';
 
 const COVER_MS = motionTokens.duration.fast * 1000; // quick: the visitor asked to go somewhere
 const REVEAL_MS = motionTokens.duration.normal * 1000; // a touch slower so the new view settles
@@ -44,18 +45,6 @@ export default function PageTransition() {
     let rafId = 0;
     let seed = 1;
 
-    function measure() {
-      const probe = document.createElement('span');
-      probe.textContent = 'M'.repeat(20);
-      probe.style.visibility = 'hidden';
-      probe.style.position = 'absolute';
-      pre.appendChild(probe);
-      const charWidth = probe.getBoundingClientRect().width / 20;
-      pre.removeChild(probe);
-      const lineHeight = parseFloat(window.getComputedStyle(pre).lineHeight);
-      return gridSize(window.innerWidth, window.innerHeight, charWidth, lineHeight);
-    }
-
     function finish() {
       cancelAnimationFrame(rafId);
       rafId = 0;
@@ -65,7 +54,7 @@ export default function PageTransition() {
     }
 
     function run(destination) {
-      const { cols, rows } = measure();
+      const { cols, rows } = measureGrid(pre, window.innerWidth, window.innerHeight);
       seed += 1;
       overlay.classList.add('is-active');
       let phase = 'cover';

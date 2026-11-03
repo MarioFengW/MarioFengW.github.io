@@ -25,6 +25,11 @@
   --signal: #e0ad62; /* amber "phosphor" for prompts and highlights */
   --ok: #7fc493;
   --field: rgba(143, 169, 211, .42);
+  /* Nebula layers: cold dust at the back, blue and rose gas, warm core + stars. */
+  --neb-dust: rgba(132, 112, 196, .42);
+  --neb-blue: rgba(143, 169, 211, .78);
+  --neb-rose: rgba(220, 146, 196, .72);
+  --neb-core: #f4e6c8;
 
   --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --display: 'Pixelta', var(--mono);
@@ -38,6 +43,7 @@
 * { margin: 0; padding: 0; }
 html { scroll-behavior: smooth; scroll-padding-top: 72px; -webkit-text-size-adjust: 100%; }
 body {
+  overflow-x: clip; /* full-bleed bands use 100vw; clip (not hidden) keeps sticky working */
   background: var(--bg);
   color: var(--ink);
   font: 400 15px/1.7 var(--mono);
@@ -106,11 +112,14 @@ ul, ol { list-style: none; }
   position: relative;
   min-height: calc(100svh - 61px);
   display: flex; align-items: center;
-  overflow: hidden;
+  /* clip, not hidden: hidden would make the hero a scroll container, and the
+     scroll-driven exit (view() timeline) would track the hero instead of the page. */
+  overflow: clip;
   border-bottom: 1px solid var(--line);
 }
 .ascii-field { position: absolute; inset: 0; overflow: hidden; }
 .ascii-field-pre {
+  position: absolute; inset: 0;
   margin: 0;
   color: var(--field);
   font: 400 13px/15px var(--mono);
@@ -118,6 +127,10 @@ ul, ol { list-style: none; }
   white-space: pre;
   user-select: none;
 }
+.nebula-dust { color: var(--neb-dust); }
+.nebula-blue { color: var(--neb-blue); }
+.nebula-rose { color: var(--neb-rose); }
+.nebula-core { color: var(--neb-core); text-shadow: 0 0 6px rgba(244, 230, 200, .35); }
 /* Dense on the right, quiet behind the copy on the left. */
 .hero-field {
   -webkit-mask-image: linear-gradient(100deg, rgba(0, 0, 0, .12) 0%, rgba(0, 0, 0, .25) 40%, #000 75%);
@@ -200,8 +213,36 @@ ul, ol { list-style: none; }
 .socials a:hover span { color: var(--signal); }
 
 /* ----------------------------------------------------- section shell --- */
-section, .contact { padding: clamp(72px, 10vw, 120px) 0; border-bottom: 1px solid var(--line); }
-.section-head { margin-bottom: 48px; }
+section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
+.section-head { position: relative; margin-bottom: 48px; }
+/* Scanline "write head" that sweeps down as the heading is revealed. */
+.section-head::after {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px;
+  background: var(--signal); box-shadow: 0 0 12px var(--signal);
+  opacity: 0; pointer-events: none;
+}
+.section-head.is-in::after { animation: scanline .5s var(--ease) forwards; }
+@keyframes scanline {
+  0% { top: 0; opacity: .9; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* --------------------------------------------------- section divider --- */
+/* Full-bleed, scroll-linked ASCII band between sections. */
+.section-divider {
+  position: relative; height: 105px; overflow: hidden;
+  margin-left: calc(50% - 50vw); width: 100vw;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.section-divider-pre {
+  margin: 0; color: var(--accent); opacity: .55;
+  font: 400 13px/15px var(--mono); white-space: pre; user-select: none;
+}
+.section-divider-label {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  padding: 4px 12px; background: var(--bg); border: 1px solid var(--line-strong);
+  color: var(--signal); font-size: .78rem; letter-spacing: .06em; white-space: nowrap;
+}
 .kicker { display: flex; gap: 14px; margin-bottom: 14px; font-size: .8rem; }
 .kicker-index { color: var(--signal); }
 .kicker-path { color: var(--ink-dim); }
@@ -224,19 +265,41 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; border-bottom: 1px soli
 .facts dt::after { content: ':'; color: var(--ink-faint); }
 .facts dd { color: var(--ink-dim); }
 
-.weather { border: 1px solid var(--line-strong); background: var(--bg-raised); }
-.weather-head { padding: 10px 16px; border-bottom: 1px solid var(--line); color: var(--ink-dim); font-size: .8rem; }
-.weather-art {
-  margin: 0; padding: 22px 16px 10px;
-  color: var(--accent); font: 500 15px/1.25 var(--mono); white-space: pre; overflow: hidden;
+/* The live sky over Taipei fills the whole About section, edge to edge. */
+.about { position: relative; isolation: isolate; }
+.about-inner { position: relative; z-index: 1; }
+.weather-backdrop {
+  position: absolute; z-index: 0; top: 0; bottom: 0;
+  left: calc(50% - 50vw); width: 100vw; overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 80%, transparent 100%);
+  transition: background-color .08s;
 }
-.weather[data-type='sun'] .weather-art,
-.weather[data-type='thunder'] .weather-art { color: var(--signal); }
-.weather-readout { padding: 6px 16px 16px; font-size: .85rem; }
+.weather-backdrop-pre {
+  margin: 0; color: var(--accent); opacity: .5;
+  font: 400 13px/15px var(--mono); white-space: pre; user-select: none;
+  transition: color .6s var(--ease), opacity .6s var(--ease);
+}
+.weather-backdrop[data-type='sun'] .weather-backdrop-pre { color: var(--signal); opacity: .32; }
+.weather-backdrop[data-type='night'] .weather-backdrop-pre { color: var(--neb-core); opacity: .5; }
+.weather-backdrop[data-type='snow'] .weather-backdrop-pre { color: var(--ink); opacity: .45; }
+.weather-backdrop[data-type='thunder'] .weather-backdrop-pre { opacity: .5; }
+.weather-backdrop.is-flash { background-color: rgba(233, 230, 223, .08); }
+.weather-backdrop.is-flash .weather-backdrop-pre { opacity: .85; color: var(--ink); transition: none; }
+
+.weather-status {
+  padding: 18px 20px; border: 1px solid var(--line-strong);
+  background: rgba(11, 13, 16, .72); backdrop-filter: blur(3px);
+}
+.weather-status-head { color: var(--ink-dim); font-size: .8rem; }
+.weather-status-temp { margin-top: 14px; font: 400 clamp(3rem, 7vw, 4.5rem)/1 var(--display); color: var(--ink); }
+.weather-status-unit { margin-left: 4px; font: 500 1rem var(--mono); color: var(--signal); vertical-align: top; }
+.weather-readout { margin-top: 12px; font-size: .85rem; }
 .weather-readout div { display: grid; grid-template-columns: 7ch 1fr; gap: 12px; padding: 4px 0; }
 .weather-readout dt { color: var(--ink-faint); }
 .weather-readout dd { color: var(--ink); }
-.weather[data-status='error'] .weather-readout dd { color: var(--ink-dim); }
+.weather-status[data-status='error'] .weather-readout dd { color: var(--ink-dim); }
+.weather-status-note { margin-top: 12px; color: var(--ink-faint); font-size: .74rem; }
 
 .highlights { margin-top: clamp(48px, 7vw, 72px); }
 .highlights-head { color: var(--ink-dim); font-size: .8rem; margin-bottom: 14px; }
@@ -384,8 +447,9 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; border-bottom: 1px soli
 @media (max-width: 560px) {
   body { font-size: 14px; }
   .hero-field {
-    -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, .3) 45%, rgba(0, 0, 0, .15) 100%);
-    mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, .3) 45%, rgba(0, 0, 0, .15) 100%);
+    /* The nebula is vivid: keep it strong above the copy, faint behind it. */
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, .35) 24%, rgba(0, 0, 0, .12) 42%, rgba(0, 0, 0, .12) 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, .35) 24%, rgba(0, 0, 0, .12) 42%, rgba(0, 0, 0, .12) 100%);
   }
   .hero-content { padding-top: 120px; }
   .exp-header { grid-template-columns: 2ch minmax(0, 1fr) 3ch; gap: 10px; }
@@ -408,4 +472,47 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; border-bottom: 1px soli
   .project-link:active, .btn:active, .socials a:active, .nav-toggle:active { transform: none; }
   .links, .links.is-open, .links li, .links.is-open li { transform: none; transition-delay: 0s; }
   .page-transition { display: none; }
+  .section-head.is-in::after { animation: none; }
+  .hero-content, .hero-field { animation: none !important; }
 }
+
+/* ------------------------------------------------------- boot screen --- */
+.boot {
+  position: fixed; inset: 0; z-index: 300; overflow: hidden; cursor: pointer;
+  /* Fail-safe: if JavaScript never runs, get out of the way after 4s. */
+  animation: boot-failsafe 0s linear 4s forwards;
+}
+.boot::before { content: ''; position: absolute; inset: 0; background: var(--bg); opacity: var(--wipe, 1); }
+@keyframes boot-failsafe { to { visibility: hidden; } }
+.boot-wipe {
+  position: absolute; inset: 0; margin: 0; color: var(--accent); opacity: .7;
+  font: 400 13px/15px var(--mono); white-space: pre; user-select: none;
+}
+.boot-log {
+  position: absolute; left: var(--gutter); bottom: clamp(48px, 12vh, 120px); margin: 0;
+  color: var(--ink); font: 400 clamp(12px, 1.6vw, 15px)/1.8 var(--mono); white-space: pre-wrap;
+  opacity: var(--wipe, 1);
+}
+.boot-hint {
+  position: absolute; right: var(--gutter); bottom: 20px;
+  color: var(--ink-faint); font-size: .72rem; opacity: var(--wipe, 1);
+}
+
+/* --------------------------------------- scroll-driven hero exit (CSS) --- */
+/* Progressive enhancement: browsers without scroll timelines simply skip it.
+   Longhands only: the CSS minifier reorders properties, and an `animation:`
+   shorthand landing after `animation-timeline` would reset it to `auto`. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-content, .hero-field {
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+    }
+    .hero-content { animation-name: hero-exit; animation-range: exit 0% exit 90%; }
+    .hero-field { animation-name: field-exit; animation-range: exit 0% exit 100%; }
+  }
+}
+@keyframes hero-exit { to { opacity: 0; transform: translateY(-48px); filter: blur(2px); } }
+@keyframes field-exit { to { opacity: .15; transform: scale(1.06); } }

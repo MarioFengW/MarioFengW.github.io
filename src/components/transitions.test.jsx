@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import PageTransition, { getHashTarget, jumpTo } from './PageTransition';
 import Header from './Header';
-import AsciiWeather from './AsciiWeather';
+import WeatherStatus from './WeatherStatus';
 import { DrawRule, useRiseVariants } from './Reveal';
 import { RAMP, cellNoise, sweepCoverage, wipeFrame } from '../lib/ascii';
 import { fadeVariants, riseVariants } from '../lib/motion-tokens';
@@ -272,12 +272,12 @@ describe('DrawRule', () => {
 
 describe('Weather readout crossfade', () => {
   it('remounts the reading when the status changes so it fades in', async () => {
-    mockReducedMotion(false);
     const city = { name: 'Taipei', latitude: 25, longitude: 121, timeZone: 'Asia/Taipei' };
-    render(<AsciiWeather city={city} fetchImpl={vi.fn().mockRejectedValue(new Error('x'))} />);
+    const { rerender } = render(<WeatherStatus city={city} weather={null} status="loading" localTime="--:--" />);
     const loading = screen.getByText('fetching…');
     expect(loading).toHaveClass('fade-in');
-    const offline = await screen.findByText('weather offline');
+    rerender(<WeatherStatus city={city} weather={null} status="error" localTime="--:--" />);
+    const offline = screen.getByText('weather offline');
     expect(offline).toHaveClass('fade-in');
     expect(offline).not.toBe(loading);
   });
