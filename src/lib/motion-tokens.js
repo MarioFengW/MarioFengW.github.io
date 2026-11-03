@@ -51,3 +51,9 @@ export const riseVariants = {
   hidden: { opacity: 0, y: motionTokens.distance.md },
   visible: { opacity: 1, y: 0, transition: springs.gentle },
 };
+
+/** Reduced-motion fallback: no movement, opacity only, at most 0.2s. */
+export const fadeVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: motionTokens.duration.fast, ease: motionTokens.easing.out } },
+};

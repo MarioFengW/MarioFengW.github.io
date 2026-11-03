@@ -1,5 +1,6 @@
 import React from 'react';
 import ScrambleText from './ScrambleText';
+import { DrawRule } from './Reveal';
 
 export default function SectionHeading({ index, kicker, title }) {
   return (
@@ -9,7 +10,7 @@ export default function SectionHeading({ index, kicker, title }) {
         <span className="kicker-path">~/{kicker}</span>
       </p>
       <ScrambleText as="h2" text={title} />
-      <span className="ascii-rule" aria-hidden="true" />
+      <DrawRule />
     </header>
   );
 }
