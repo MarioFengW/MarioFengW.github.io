@@ -41,6 +41,14 @@ CI runs `npm test` before every deploy.
   Elements hidden for an entrance animation carry `data-reveal`, and a `<noscript>` style (in
   `gatsby-ssr.js`) shows them when JavaScript is off.
 - **Scroll meter** in the header is an ASCII progress bar (`asciiProgress` in `src/lib/ascii.js`).
+- **Section transitions** (`PageTransition.jsx`): clicking any in-page `#link` plays a diagonal ASCII
+  wipe (cover 180ms, jump while covered, reveal 300ms), then moves focus to the section and records
+  it in history. Never blocks input, and a second click interrupts it. Reduced motion jumps instantly; add
+  `data-no-transition` to a link to opt out (the skip link does).
+- **State transitions:** the nav marks the current section (`aria-current`) with a drawn underline;
+  the mobile menu fades/slides in with staggered items; the weather reading crossfades; heading rules
+  draw in via `clip-path`; buttons and cards have press feedback. Reduced motion swaps every entrance
+  for an opacity fade of 0.2s or less.
 - **Headings** decode from random glyphs the first time they scroll into view (`ScrambleText.jsx`);
   screen readers always get the real text.
 - **Weather** (`AsciiWeather.jsx`) shows live conditions for a fixed city (`currentCity` in content)

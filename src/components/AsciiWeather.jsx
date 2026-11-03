@@ -54,7 +54,8 @@ export default function AsciiWeather({ city, fetchImpl }) {
       <pre className="weather-art" aria-hidden="true">{art.join('\n')}</pre>
       <dl className="weather-readout" aria-live="polite">
         <div><dt>city</dt><dd>{city.name}</dd></div>
-        <div><dt>now</dt><dd>{reading}</dd></div>
+        {/* Keyed by status so loading -> ready/offline crossfades instead of snapping. */}
+        <div><dt>now</dt><dd key={status} className="fade-in">{reading}</dd></div>
         <div><dt>local</dt><dd>{localTime}</dd></div>
       </dl>
     </figure>

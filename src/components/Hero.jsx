@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { m } from 'motion/react';
 import { profile } from '../data/content';
-import { motionTokens, riseVariants, springs } from '../lib/motion-tokens';
+import { motionTokens, springs } from '../lib/motion-tokens';
+import { useRiseVariants } from './Reveal';
 import useReducedMotion from '../hooks/useReducedMotion';
 import AsciiField from './AsciiField';
 import SocialLinks from './SocialLinks';
@@ -31,6 +32,7 @@ const tap = { scale: motionTokens.scale.press };
 export default function Hero() {
   const [first, ...rest] = profile.name.split(' ');
   const reducedMotion = useReducedMotion();
+  const rise = useRiseVariants();
   const [playing, setPlaying] = useState(true);
 
   // Respect the OS setting by default; the visitor can still press play.
@@ -58,9 +60,9 @@ export default function Hero() {
           <br />
           {rest.join(' ')}
         </h1>
-        <m.p className="hero-role" variants={riseVariants} data-reveal="">{profile.role}</m.p>
-        <m.p className="hero-summary" variants={riseVariants} data-reveal="">{profile.summary}</m.p>
-        <m.div className="hero-actions" variants={riseVariants} data-reveal="">
+        <m.p className="hero-role" variants={rise} data-reveal="">{profile.role}</m.p>
+        <m.p className="hero-summary" variants={rise} data-reveal="">{profile.summary}</m.p>
+        <m.div className="hero-actions" variants={rise} data-reveal="">
           <m.a className="btn btn-primary" href="#projects" whileTap={tap} transition={springs.snappy}>
             <span aria-hidden="true">&gt;</span>
             <span>view projects</span>
@@ -70,11 +72,11 @@ export default function Hero() {
             <span>email me</span>
           </m.a>
         </m.div>
-        <m.p className="hero-status" variants={riseVariants} data-reveal="">
+        <m.p className="hero-status" variants={rise} data-reveal="">
           <span className="status-dot" aria-hidden="true" />
           {profile.status}
         </m.p>
-        <m.div variants={riseVariants} data-reveal="">
+        <m.div variants={rise} data-reveal="">
           <SocialLinks primaryOnly className="hero-socials" />
         </m.div>
       </m.div>

@@ -3,8 +3,34 @@ import ScrollMeter from './ScrollMeter';
 
 export const navItems = ['about', 'expertise', 'experience', 'projects', 'contact'];
 
+/** Tracks which section is in the reading zone (a band just under the header). */
+export function useActiveSection(ids) {
+  const [active, setActive] = useState(null);
+
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        });
+      },
+      // Only a thin band ~30% down the viewport counts, so exactly one section wins.
+      { rootMargin: '-30% 0px -69% 0px' }
+    );
+    ids.forEach((id) => {
+      const node = document.getElementById(id);
+      if (node) observer.observe(node);
+    });
+    return () => observer.disconnect();
+  }, [ids]);
+
+  return active;
+}
+
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const active = useActiveSection(navItems);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -35,10 +61,14 @@ export default function Header() {
         <nav id="primary-nav" className={`links${open ? ' is-open' : ''}`} aria-label="Primary">
           <ul>
             {navItems.map((item, index) => (
-              <li key={item}>
-                <a href={`#${item}`} onClick={() => setOpen(false)}>
+              <li key={item} style={{ '--i': index }}>
+                <a
+                  href={`#${item}`}
+                  onClick={() => setOpen(false)}
+                  aria-current={active === item ? 'location' : undefined}
+                >
                   <span className="link-index" aria-hidden="true">0{index + 1}</span>
-                  {item}
+                  <span className="link-label">{item}</span>
                 </a>
               </li>
             ))}

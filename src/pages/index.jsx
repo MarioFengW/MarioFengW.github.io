@@ -7,11 +7,14 @@ import Experience from '../components/Experience';
 import Projects from '../components/Projects';
 import Footer from '../components/Footer';
 import MotionProvider from '../components/MotionProvider';
+import PageTransition from '../components/PageTransition';
 
 export default function HomePage() {
   return (
     <MotionProvider>
-      <a className="skip-link" href="#about">Skip to content</a>
+      {/* Skip link must act instantly, so it opts out of the section transition. */}
+      <a className="skip-link" href="#about" data-no-transition="">Skip to content</a>
+      <PageTransition />
       <Header />
       <main>
         <Hero />
