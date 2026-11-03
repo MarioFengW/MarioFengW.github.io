@@ -3,6 +3,7 @@ import { m } from 'motion/react';
 import { profile } from '../data/content';
 import { motionTokens, springs } from '../lib/motion-tokens';
 import { useRiseVariants } from './Reveal';
+import { useBooted } from './BootScreen';
 import useReducedMotion from '../hooks/useReducedMotion';
 import AsciiField from './AsciiField';
 import SocialLinks from './SocialLinks';
@@ -18,21 +19,27 @@ const charVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0 } },
 };
-const introVariants = {
-  hidden: {},
-  visible: {
-    transition: {
-      delayChildren: COMMAND.length * motionTokens.stagger.type + motionTokens.duration.fast,
-      staggerChildren: motionTokens.stagger.list,
+// The rest of the hero waits for `whoami` to finish typing — unless the visitor
+// asked for reduced motion, in which case nothing should hold content back.
+export function getIntroVariants(reducedMotion) {
+  return {
+    hidden: {},
+    visible: {
+      transition: {
+        delayChildren: reducedMotion ? 0 : COMMAND.length * motionTokens.stagger.type + motionTokens.duration.fast,
+        staggerChildren: reducedMotion ? 0 : motionTokens.stagger.list,
+      },
     },
-  },
-};
+  };
+}
 const tap = { scale: motionTokens.scale.press };
 
 export default function Hero() {
   const [first, ...rest] = profile.name.split(' ');
   const reducedMotion = useReducedMotion();
   const rise = useRiseVariants();
+  // The intro waits for the boot screen, so it plays where the visitor can see it.
+  const intro = useBooted() ? 'visible' : 'hidden';
   const [playing, setPlaying] = useState(true);
 
   // Respect the OS setting by default; the visitor can still press play.
@@ -43,11 +50,11 @@ export default function Hero() {
   return (
     <section className="hero" id="top">
       <AsciiField className="hero-field" playing={playing} />
-      <m.div className="hero-content" initial="hidden" animate="visible" variants={introVariants}>
+      <m.div className="hero-content" initial="hidden" animate={intro} variants={getIntroVariants(reducedMotion)}>
         <p className="prompt">
           <span className="prompt-sign" aria-hidden="true">$</span>{' '}
           <span className="sr-only">{COMMAND}</span>
-          <m.span variants={typeVariants} initial="hidden" animate="visible" aria-hidden="true">
+          <m.span variants={typeVariants} initial="hidden" animate={intro} aria-hidden="true">
             {COMMAND.split('').map((char, index) => (
               // eslint-disable-next-line react/no-array-index-key
               <m.span key={index} variants={charVariants} data-reveal="">{char}</m.span>

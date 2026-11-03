@@ -11,49 +11,13 @@ export const WEATHER_LABELS = {
   wind: 'Windy',
 };
 
-// Two frames per condition; the widget alternates between them.
-export const WEATHER_ART = {
-  sun: [
-    ['    \\   /    ', '     .-.     ', '  - (   ) -  ', "     `-'     ", '    /   \\    '],
-    ['     \\ /     ', '   - .-. -   ', ' -- (   ) -- ', "   - `-' -   ", '     / \\     '],
-  ],
-  night: [
-    ['  *     .-.  ', '     . (   ) ', "  .    `-'   ", '     *    .  ', ' .       *   '],
-    ['  .     .-.  ', '     * (   ) ', "  *    `-'   ", '     .    *  ', ' *       .   '],
-  ],
-  cloud: [
-    ['             ', '     .--.    ', '  .-(    ).  ', ' (___.__)__) ', '             '],
-    ['             ', '    .--.     ', ' .-(    ).   ', '(___.__)__)  ', '             '],
-  ],
-  fog: [
-    ['             ', ' _ - _ - _ - ', '  _ - _ - _  ', ' _ - _ - _ - ', '             '],
-    ['             ', '  _ - _ - _  ', ' _ - _ - _ - ', '  _ - _ - _  ', '             '],
-  ],
-  rain: [
-    ['     .-.     ', '    (   ).   ', '   (___(__)  ', "    ,',',',  ", "    ,',',',  "],
-    ['     .-.     ', '    (   ).   ', '   (___(__)  ', "   ',',','   ", "   ',',','   "],
-  ],
-  thunder: [
-    ['     .-.     ', '    (   ).   ', '   (___(__)  ', "    ,'/,',   ", "    ,/',',   "],
-    ['     .-.     ', '    (   ).   ', '   (___(__)  ', "   ',',\\'    ", "   ',','\\    "],
-  ],
-  snow: [
-    ['     .-.     ', '    (   ).   ', '   (___(__)  ', '    *  *  *  ', '   *  *  *   '],
-    ['     .-.     ', '    (   ).   ', '   (___(__)  ', '   *  *  *   ', '    *  *  *  '],
-  ],
-  wind: [
-    ['             ', ' ~~~~~~~~    ', '   ~~~~~~~~~ ', ' ~~~~~~      ', '             '],
-    ['             ', '  ~~~~~~~~   ', ' ~~~~~~~~~   ', '   ~~~~~~    ', '             '],
-  ],
-};
-
 const THUNDER = [95, 96, 99];
 const SNOW = [71, 73, 75, 77, 85, 86];
 const RAIN = [51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82];
 const FOG = [45, 48];
 const CLOUD = [2, 3];
 
-/** Map an Open-Meteo WMO weather code to one of the WEATHER_ART keys. */
+/** Map an Open-Meteo WMO weather code to one of the weather scene types (see weatherField.js). */
 export function mapWeatherCode(code, windSpeedKmh = 0, isDay = 1) {
   if (windSpeedKmh >= 40) return 'wind';
   if (THUNDER.includes(code)) return 'thunder';

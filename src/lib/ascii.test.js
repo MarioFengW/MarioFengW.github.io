@@ -4,10 +4,7 @@ import {
   SCRAMBLE_GLYPHS,
   charForIntensity,
   clamp,
-  contourIntensity,
-  fieldHeight,
   gridSize,
-  renderTopoFrame,
   scrambleText,
 } from './ascii';
 
@@ -32,65 +29,6 @@ describe('charForIntensity', () => {
 
   it('supports a custom ramp', () => {
     expect(charForIntensity(0.5, 'ab')).toBe('b');
-  });
-});
-
-describe('fieldHeight', () => {
-  it('stays within 0..1 without a pointer', () => {
-    for (let i = 0; i < 200; i++) {
-      const h = fieldHeight(i * 3.1, i * 1.7, i * 0.13);
-      expect(h).toBeGreaterThanOrEqual(0);
-      expect(h).toBeLessThanOrEqual(1);
-    }
-  });
-
-  it('raises the field directly under the pointer', () => {
-    const base = fieldHeight(20, 10, 1);
-    const lifted = fieldHeight(20, 10, 1, { x: 20, y: 10 });
-    expect(lifted - base).toBeCloseTo(0.35, 5);
-  });
-
-  it('has negligible pointer influence far away', () => {
-    const base = fieldHeight(0, 0, 1);
-    const far = fieldHeight(0, 0, 1, { x: 400, y: 400 });
-    expect(far - base).toBeLessThan(1e-6);
-  });
-});
-
-describe('contourIntensity', () => {
-  it('is brightest exactly on a contour line', () => {
-    expect(contourIntensity(1 / 7)).toBeCloseTo(1, 10);
-  });
-
-  it('is zero halfway between lines', () => {
-    expect(contourIntensity(1.5 / 7)).toBe(0);
-  });
-});
-
-describe('renderTopoFrame', () => {
-  it('returns rows x cols characters', () => {
-    const lines = renderTopoFrame(30, 8, 0).split('\n');
-    expect(lines).toHaveLength(8);
-    lines.forEach((line) => expect(line).toHaveLength(30));
-  });
-
-  it('only uses ramp characters', () => {
-    const frame = renderTopoFrame(40, 10, 2.5, { x: 10, y: 4 }).replace(/\n/g, '');
-    for (const ch of frame) expect(RAMP).toContain(ch);
-  });
-
-  it('draws visible contour lines', () => {
-    expect(renderTopoFrame(80, 20, 0).trim().length).toBeGreaterThan(0);
-  });
-
-  it('is deterministic for the same inputs and animates over time', () => {
-    expect(renderTopoFrame(20, 5, 1)).toBe(renderTopoFrame(20, 5, 1));
-    expect(renderTopoFrame(60, 20, 0)).not.toBe(renderTopoFrame(60, 20, 3));
-  });
-
-  it('returns an empty string for an empty grid', () => {
-    expect(renderTopoFrame(0, 10, 0)).toBe('');
-    expect(renderTopoFrame(10, 0, 0)).toBe('');
   });
 });
 

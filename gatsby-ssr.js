@@ -6,7 +6,9 @@ import './src/styles/global.css';
 
 // Scroll-reveal elements are server-rendered at opacity 0 and animated in by JS.
 // Without JS, show them as-is. (Set here, not in Head, so the <style> isn't escaped.)
-export const NO_JS_CSS = '[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important}';
+// Not exported: gatsby-ssr.js may only export Gatsby API names (else error #11329).
+const NO_JS_CSS =
+  '[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important}.boot{display:none!important}';
 
 export const onRenderBody = ({ setHtmlAttributes, setHeadComponents }) => {
   setHtmlAttributes({ lang: 'en' });

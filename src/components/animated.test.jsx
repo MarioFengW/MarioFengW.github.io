@@ -2,13 +2,10 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, renderHook, screen } from '@testing-library/react';
 import AsciiField from './AsciiField';
-import AsciiWeather from './AsciiWeather';
 import ScrambleText from './ScrambleText';
 import useReducedMotion from '../hooks/useReducedMotion';
-import { WEATHER_ART } from '../lib/weather';
 import { mockAnimationFrame, mockIntersectionObserver, mockReducedMotion } from '../test/browser';
 
-const city = { name: 'Taipei', latitude: 25.033, longitude: 121.5654, timeZone: 'Asia/Taipei' };
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -84,72 +81,6 @@ describe('ScrambleText', () => {
   });
 });
 
-describe('AsciiWeather', () => {
-  beforeEach(() => {
-    mockReducedMotion(false);
-  });
-
-  it('shows a loading state, then the live reading', async () => {
-    const fetchImpl = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ current: { temperature_2m: 27.2, weather_code: 0, wind_speed_10m: 3, is_day: 1 } }),
-    });
-    const { container } = render(<AsciiWeather city={city} fetchImpl={fetchImpl} />);
-    expect(screen.getByText('fetching…')).toBeInTheDocument();
-    expect(await screen.findByText('27°C · Clear sky')).toBeInTheDocument();
-    const figure = container.querySelector('figure');
-    expect(figure).toHaveAttribute('data-status', 'ready');
-    expect(figure).toHaveAttribute('data-type', 'sun');
-    expect(screen.getByText(/^\d{2}:\d{2}$/)).toBeInTheDocument();
-  });
-
-  it('falls back gracefully when the request fails', async () => {
-    const fetchImpl = vi.fn().mockRejectedValue(new Error('offline'));
-    const { container } = render(<AsciiWeather city={city} fetchImpl={fetchImpl} />);
-    expect(await screen.findByText('weather offline')).toBeInTheDocument();
-    expect(container.querySelector('figure')).toHaveAttribute('data-status', 'error');
-  });
-
-  it('uses window.fetch when no fetch implementation is passed', async () => {
-    const fetchSpy = vi.fn().mockRejectedValue(new Error('offline'));
-    vi.stubGlobal('fetch', fetchSpy);
-    render(<AsciiWeather city={city} />);
-    expect(await screen.findByText('weather offline')).toBeInTheDocument();
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-  });
-
-  it('ignores results that arrive after unmount', async () => {
-    const consoleError = vi.spyOn(console, 'error');
-    let resolve;
-    let reject;
-    const ok = vi.fn(() => new Promise((r) => { resolve = r; }));
-    const fail = vi.fn(() => new Promise((_r, j) => { reject = j; }));
-    render(<AsciiWeather city={city} fetchImpl={ok} />).unmount();
-    render(<AsciiWeather city={city} fetchImpl={fail} />).unmount();
-    await act(async () => {
-      resolve({ ok: true, json: async () => ({ current: { temperature_2m: 1, weather_code: 0, is_day: 1 } }) });
-      reject(new Error('late'));
-    });
-    expect(consoleError).not.toHaveBeenCalled();
-  });
-
-  it('alternates animation frames, unless reduced motion is on', () => {
-    vi.useFakeTimers();
-    const pending = vi.fn(() => new Promise(() => {})); // stays loading -> cloud art
-    const { container, unmount } = render(<AsciiWeather city={city} fetchImpl={pending} />);
-    const art = (root) => root.querySelector('.weather-art').textContent;
-    expect(art(container)).toBe(WEATHER_ART.cloud[0].join('\n'));
-    act(() => vi.advanceTimersByTime(650));
-    expect(art(container)).toBe(WEATHER_ART.cloud[1].join('\n'));
-    unmount();
-
-    mockReducedMotion(true);
-    const reduced = render(<AsciiWeather city={city} fetchImpl={pending} />);
-    act(() => vi.advanceTimersByTime(2000));
-    expect(art(reduced.container)).toBe(WEATHER_ART.cloud[0].join('\n'));
-  });
-});
-
 describe('AsciiField', () => {
   const rect = { left: 0, top: 0, right: 160, bottom: 60, width: 160, height: 60, x: 0, y: 0 };
   const FRAME = 1000 / 24;
@@ -165,8 +96,9 @@ describe('AsciiField', () => {
     vi.spyOn(performance, 'now').mockReturnValue(0);
   });
 
-  const text = (container) => container.querySelector('pre').textContent;
-  const lines = (container) => text(container).split('\n');
+  // All four nebula layers together; line counts come from the first layer.
+  const text = (container) => [...container.querySelectorAll('pre')].map((p) => p.textContent).join('\u0000');
+  const lines = (container) => container.querySelector('pre').textContent.split('\n');
 
   it('fills its box with a decorative ASCII frame and animates', () => {
     mockReducedMotion(false);

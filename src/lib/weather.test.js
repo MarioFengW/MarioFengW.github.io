@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  WEATHER_ART,
   WEATHER_LABELS,
   buildForecastUrl,
   fetchCurrentWeather,
@@ -34,16 +33,6 @@ describe('mapWeatherCode', () => {
 
   it('defaults to daytime clear sky', () => {
     expect(mapWeatherCode(0)).toBe('sun');
-  });
-});
-
-describe('WEATHER_ART', () => {
-  it('has a label and two equal-height frames for every condition', () => {
-    Object.entries(WEATHER_ART).forEach(([type, frames]) => {
-      expect(WEATHER_LABELS[type]).toBeTruthy();
-      expect(frames).toHaveLength(2);
-      expect(frames[0]).toHaveLength(frames[1].length);
-    });
   });
 });
 

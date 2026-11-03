@@ -8,10 +8,13 @@ import Projects from '../components/Projects';
 import Footer from '../components/Footer';
 import MotionProvider from '../components/MotionProvider';
 import PageTransition from '../components/PageTransition';
+import BootProvider from '../components/BootScreen';
+import SectionDivider from '../components/SectionDivider';
 
 export default function HomePage() {
   return (
     <MotionProvider>
+      <BootProvider>
       {/* Skip link must act instantly, so it opts out of the section transition. */}
       <a className="skip-link" href="#about" data-no-transition="">Skip to content</a>
       <PageTransition />
@@ -20,12 +23,17 @@ export default function HomePage() {
         <Hero />
         <div className="wrap">
           <About />
+          <SectionDivider label=">> 02 expertise" />
           <Expertise />
+          <SectionDivider label=">> 03 experience" />
           <Experience />
+          <SectionDivider label=">> 04 projects" />
           <Projects />
+          <SectionDivider label=">> 05 contact" />
           <Footer />
         </div>
       </main>
+      </BootProvider>
     </MotionProvider>
   );
 }

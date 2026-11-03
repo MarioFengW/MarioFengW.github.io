@@ -30,9 +30,19 @@ CI runs `npm test` before every deploy.
 ## How the ASCII design works
 
 - **Content** lives in `src/data/content.js`. Edit text, projects, experience and links there.
-- **Hero field** (`src/components/AsciiField.jsx`) is a live ASCII topographic map:
-  the height field and contour math are pure functions in `src/lib/ascii.js`, and the pointer
-  raises a hill that bends the contours. Runs at 24fps and pauses offscreen and in background tabs.
+- **Hero nebula** (`src/components/AsciiField.jsx`, math in `src/lib/nebula.js`): domain-warped
+  fractal noise drawn as four coloured glyph layers (dust, blue, rose, hot core) plus twinkling
+  stars; the pointer swirls and brightens the gas. ~4ms per full-desktop frame at 24fps; pauses
+  offscreen and in background tabs. Shared loop/measure logic lives in `src/hooks/useAsciiLoop.js`.
+- **Boot screen** (`BootScreen.jsx`): a ~0.6s terminal boot log on every load, dissolving in an
+  ASCII wipe; the hero intro starts as it fades. Click/any key skips; skipped under reduced motion;
+  hidden without JS; a CSS fail-safe removes it after 4s if JS never runs.
+- **Weather backdrop** (`WeatherBackdrop.jsx`, scenes in `src/lib/weatherField.js`): the live
+  Taipei condition (rain, storm with lightning, snow, clouds, fog, wind, sun rays or stars) fills
+  the whole About section; `WeatherStatus.jsx` shows the reading.
+- **Section dividers** (`SectionDivider.jsx`): scroll-linked ASCII bands between sections that sweep
+  in and out as you scroll past, labelled with the next section. Headings print in behind a
+  scanline, and the hero fades out on scroll (CSS scroll-driven animation, progressive enhancement).
   A `[ pause ascii ]` button in the hero stops/starts it (WCAG 2.2.2). If the OS asks for reduced
   motion it starts paused, but visitors can still press play.
 - **Motion** uses [`motion`](https://motion.dev) (`m` + `LazyMotion`), with every duration, easing and
