@@ -1,15 +1,14 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
-import BootProvider, { BOOT_LINES, BOOT_LOG_MS, BootScreen, bootLog, useBooted } from './BootScreen';
+import BootScreen, { BOOT_LINES, BOOT_LOG_MS, bootLog } from './BootScreen';
 import SectionDivider, { dividerFrame, dividerProgress } from './SectionDivider';
 import WeatherBackdrop from './WeatherBackdrop';
 import About from './About';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import Hero, { getIntroVariants } from './Hero';
+import Hero from './Hero';
 import SectionHeading from './SectionHeading';
-import { renderWithMotion } from '../test/render';
 import { mockAnimationFrame, mockIntersectionObserver, mockReducedMotion } from '../test/browser';
 
 // Every box measures 160x60 px with 8px-wide glyphs on 15px lines -> 20 cols x 4 rows.
@@ -103,29 +102,17 @@ describe('BootScreen', () => {
     expect(container.querySelector('.boot')).toBeNull();
   });
 
-  it('BootProvider flips to booted when the boot screen ends', () => {
-    mockReducedMotion(false);
-    const raf = mockAnimationFrame();
-    const { result } = renderHook(() => useBooted(), { wrapper: BootProvider });
-    expect(result.current).toBe(false);
-    act(() => raf.step(0));
-    act(() => raf.step(BOOT_LOG_MS + 400));
-    expect(result.current).toBe(true);
-  });
-
-  it('outside a provider everything counts as booted', () => {
-    expect(renderHook(() => useBooted()).result.current).toBe(true);
-  });
-
-  it('the hero content waits while booting', () => {
+  it('the page underneath is already rendered and visible while booting', () => {
     mockReducedMotion(false);
     mockAnimationFrame();
-    const { container } = renderWithMotion(
-      <BootProvider>
+    const { container } = render(
+      <>
         <Hero />
-      </BootProvider>
+        <BootScreen />
+      </>
     );
-    expect(container.querySelector('.hero-summary')).not.toBeVisible();
+    expect(container.querySelector('.boot')).not.toBeNull();
+    expect(container.querySelector('.hero-summary')).toBeVisible(); // the dissolve reveals it
   });
 });
 
@@ -231,7 +218,7 @@ describe('About with live weather', () => {
       ok: true,
       json: async () => ({ current: { temperature_2m: 26.4, weather_code: 63, wind_speed_10m: 4, is_day: 1 } }),
     });
-    const { container } = renderWithMotion(<About fetchImpl={fetchImpl} />);
+    const { container } = render(<About fetchImpl={fetchImpl} />);
     expect(container.querySelector('.weather-backdrop')).toHaveAttribute('data-type', 'cloud'); // while loading
     expect(await screen.findByText('Rain')).toBeInTheDocument();
     expect(container.querySelector('.weather-status-temp')).toHaveTextContent('26°C');
@@ -242,7 +229,7 @@ describe('About with live weather', () => {
   it('falls back to clouds and an offline note when the request fails', async () => {
     mockReducedMotion(true);
     const raf = mockAnimationFrame();
-    const { container } = renderWithMotion(<About fetchImpl={vi.fn().mockRejectedValue(new Error('offline'))} />);
+    const { container } = render(<About fetchImpl={vi.fn().mockRejectedValue(new Error('offline'))} />);
     expect(await screen.findByText('weather offline')).toBeInTheDocument();
     expect(container.querySelector('.weather-backdrop')).toHaveAttribute('data-type', 'cloud');
     expect(container.querySelector('.weather-status-temp')).toHaveTextContent('--°C');
@@ -255,7 +242,7 @@ describe('About with live weather', () => {
     const consoleError = vi.spyOn(console, 'error');
     let resolve;
     vi.stubGlobal('fetch', vi.fn(() => new Promise((r) => { resolve = r; })));
-    const { unmount } = renderWithMotion(<About />);
+    const { unmount } = render(<About />);
     expect(window.fetch).toHaveBeenCalledTimes(1);
     unmount();
     await act(async () => {
@@ -263,19 +250,9 @@ describe('About with live weather', () => {
     });
     let reject;
     vi.stubGlobal('fetch', vi.fn(() => new Promise((_r, j) => { reject = j; })));
-    renderWithMotion(<About />).unmount();
+    render(<About />).unmount();
     await act(async () => reject(new Error('late')));
     expect(consoleError).not.toHaveBeenCalled();
-  });
-});
-
-describe('Hero intro timing', () => {
-  it('waits for the typed command, except under reduced motion', () => {
-    const normal = getIntroVariants(false).visible.transition;
-    const reduced = getIntroVariants(true).visible.transition;
-    expect(normal.delayChildren).toBeGreaterThan(0.5);
-    expect(normal.staggerChildren).toBeGreaterThan(0);
-    expect(reduced).toEqual({ delayChildren: 0, staggerChildren: 0 });
   });
 });
 
@@ -291,16 +268,12 @@ describe('scroll-driven CSS', () => {
 });
 
 describe('SectionHeading', () => {
-  it('starts the scanline once it enters the viewport', async () => {
+  it('is just the heading and a rule: no eyebrow, nothing hidden by default', () => {
     mockReducedMotion(false);
-    const { container } = renderWithMotion(<SectionHeading index="02" kicker="expertise" title="What I work on" />);
-    const head = container.querySelector('.section-head');
-    // The observed element is never clipped; the clip lives on the inner body.
-    expect(head.style.clipPath).toBe('');
-    expect(container.querySelector('.section-head-body')).toHaveAttribute('data-reveal');
-    expect(container.querySelector('.section-head-body').style.clipPath).toBe('inset(0 0 100% 0)'); // starts hidden
-    await waitFor(() => expect(head).toHaveClass('is-in'));
-    // (jsdom cannot interpolate clip-path; the reveal itself is verified in a real browser.)
-    expect(screen.getByRole('heading', { level: 2, name: 'What I work on' })).toBeInTheDocument();
+    const { container } = render(<SectionHeading title="What I work on" />);
+    expect(screen.getByRole('heading', { level: 2, name: 'What I work on' })).toBeVisible();
+    expect(container.querySelector('.kicker')).toBeNull();
+    expect(container.querySelector('.ascii-rule')).toHaveAttribute('aria-hidden', 'true');
+    expect(container.querySelector('[style*="clip-path"]')).toBeNull();
   });
 });

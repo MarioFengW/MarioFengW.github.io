@@ -1,76 +1,92 @@
-import React, { useState } from 'react';
-import { AnimatePresence, m } from 'motion/react';
+import React, { useCallback, useRef, useState } from 'react';
 import { experience } from '../data/content';
-import { motionTokens } from '../lib/motion-tokens';
+import { timelineProgress } from '../lib/scrollMath';
+import useScrollLinked from '../hooks/useScrollLinked';
 import SectionHeading from './SectionHeading';
-import { RevealItem, RevealList } from './Reveal';
 
-// Height animates open/closed; content fades slightly behind it.
-const panelMotion = {
-  initial: { height: 0, opacity: 0 },
-  animate: { height: 'auto', opacity: 1 },
-  exit: { height: 0, opacity: 0 },
-  transition: { duration: motionTokens.duration.normal, ease: motionTokens.easing.smooth },
-};
-
+/**
+ * Career as a timeline: the rail fills as you scroll through it and each
+ * milestone lights up once the line reaches it. Entries open as an accordion
+ * (pure CSS grid-rows transition; closed panels are inert).
+ */
 export default function Experience() {
   const [openIndex, setOpenIndex] = useState(0);
+  const timelineRef = useRef(null);
+  const progressRef = useRef(null);
 
   const toggle = (index) => {
     setOpenIndex((current) => (current === index ? -1 : index));
   };
 
+  const update = useCallback((timeline) => {
+    // Read everything first, then write: no layout thrashing.
+    const rect = timeline.getBoundingClientRect();
+    const progress = timelineProgress(rect.top, rect.height, window.innerHeight);
+    const reach = rect.top + progress * rect.height;
+    const items = [...timeline.querySelectorAll('.exp-item')];
+    const nodeCenters = items.map((item) => {
+      const node = item.querySelector('.exp-node').getBoundingClientRect();
+      return node.top + node.height / 2;
+    });
+    progressRef.current.style.transform = `scaleY(${progress})`;
+    items.forEach((item, index) => item.toggleAttribute('data-passed', nodeCenters[index] <= reach));
+  }, []);
+
+  useScrollLinked(timelineRef, update);
+
   return (
     <section id="experience">
-      <SectionHeading index="03" kicker="experience" title="Experience" />
-      <RevealList as="ol" className="exp-log">
-        {experience.map((item, index) => {
-          const isOpen = openIndex === index;
-          const panelId = `experience-panel-${index}`;
-          return (
-            <RevealItem className={`exp-item${isOpen ? ' is-open' : ''}`} key={`${item.period}-${item.title}`}>
-              <h3 className="exp-heading">
-                <button
-                  type="button"
-                  className="exp-header"
-                  onClick={() => toggle(index)}
-                  aria-controls={panelId}
-                  aria-expanded={isOpen}
-                >
-                  <span className="exp-node" aria-hidden="true">{isOpen ? '●' : '○'}</span>
-                  <span className="exp-title">
-                    {item.title} <span className="exp-at">@ {item.organization}</span>
-                  </span>
-                  <span className="exp-period">{item.period}</span>
-                  <span className="exp-icon" aria-hidden="true">{isOpen ? '[-]' : '[+]'}</span>
-                </button>
-              </h3>
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <m.div key="panel" className="exp-panel" id={panelId} role="region" aria-label={item.title} {...panelMotion}>
-                    <div className="exp-panel-inner">
-                      <div className="exp-meta">
-                        {item.location && <span>{item.location}</span>}
-                        {item.link && (
-                          <a href={item.link} target="_blank" rel="noopener noreferrer">
-                            {item.linkLabel || item.link} <span aria-hidden="true">↗</span>
-                          </a>
-                        )}
-                      </div>
-                      <p className="exp-desc">{item.description}</p>
-                      {item.stack && (
-                        <ul className="stack" aria-label="Tech stack">
-                          {item.stack.map((tech) => <li key={tech}>{tech}</li>)}
-                        </ul>
+      <SectionHeading title="Experience" />
+      <div className="exp-timeline" ref={timelineRef}>
+        <span className="exp-rail" aria-hidden="true">
+          <span className="exp-progress" ref={progressRef} />
+        </span>
+        <ol className="exp-log">
+          {experience.map((item, index) => {
+            const isOpen = openIndex === index;
+            const panelId = `experience-panel-${index}`;
+            return (
+              <li className={`exp-item${isOpen ? ' is-open' : ''}`} key={`${item.period}-${item.title}`}>
+                <h3 className="exp-heading">
+                  <button
+                    type="button"
+                    className="exp-header"
+                    onClick={() => toggle(index)}
+                    aria-controls={panelId}
+                    aria-expanded={isOpen}
+                  >
+                    <span className="exp-node" aria-hidden="true" />
+                    <span className="exp-title">
+                      {item.title} <span className="exp-at">@ {item.organization}</span>
+                    </span>
+                    {item.metric && <span className="exp-metric">{item.metric}</span>}
+                    <span className="exp-period">{item.period}</span>
+                    <span className="exp-icon" aria-hidden="true">{isOpen ? '[-]' : '[+]'}</span>
+                  </button>
+                </h3>
+                <div className="exp-panel" id={panelId} role="region" aria-label={item.title} inert={isOpen ? undefined : ''}>
+                  <div className="exp-panel-inner">
+                    <div className="exp-meta">
+                      {item.location && <span>{item.location}</span>}
+                      {item.link && (
+                        <a href={item.link} target="_blank" rel="noopener noreferrer">
+                          {item.linkLabel || item.link} <span aria-hidden="true">↗</span>
+                        </a>
                       )}
                     </div>
-                  </m.div>
-                )}
-              </AnimatePresence>
-            </RevealItem>
-          );
-        })}
-      </RevealList>
+                    <p className="exp-desc">{item.description}</p>
+                    {item.stack && (
+                      <ul className="stack" aria-label="Tech stack">
+                        {item.stack.map((tech) => <li key={tech}>{tech}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
     </section>
   );
 }

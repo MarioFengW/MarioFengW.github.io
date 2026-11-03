@@ -1,16 +1,8 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { asciiProgress, clamp, wipeFrame } from '../lib/ascii';
 import { easeOutCubic, motionTokens } from '../lib/motion-tokens';
 import useReducedMotion from '../hooks/useReducedMotion';
 import { measureGrid } from '../hooks/useAsciiLoop';
-
-// Outside a BootProvider (e.g. isolated tests) everything counts as booted.
-const BootContext = createContext(true);
-
-/** True once the boot screen has finished (or was skipped). */
-export function useBooted() {
-  return useContext(BootContext);
-}
 
 export const BOOT_LINES = [
   'mario-feng-wu ~ % ./portfolio --boot',
@@ -39,7 +31,7 @@ export function bootLog(elapsed) {
  * an ASCII wipe to reveal the page. Click or press any key to skip.
  * Server-rendered so it covers the page from the first paint.
  */
-export function BootScreen({ onDone }) {
+export default function BootScreen({ onDone }) {
   const [done, setDone] = useState(false);
   const reducedMotion = useReducedMotion();
   const overlayRef = useRef(null);
@@ -52,8 +44,8 @@ export function BootScreen({ onDone }) {
     let rafId = 0;
     let finished = false;
     let announced = false;
-    // "Booted" is announced as soon as the dissolve starts, so the hero intro
-    // plays while the boot screen fades instead of after it.
+    // `onDone` fires as soon as the dissolve starts (the page is already
+    // visible underneath), not after the overlay is gone.
     const announce = () => {
       if (announced) return;
       announced = true;
@@ -119,16 +111,5 @@ export function BootScreen({ onDone }) {
       <pre ref={logRef} className="boot-log">{bootLog(0)}</pre>
       <p className="boot-hint">click or press any key to skip</p>
     </div>
-  );
-}
-
-/** Provides the "booted" flag and mounts the boot screen once for the page. */
-export default function BootProvider({ children }) {
-  const [booted, setBooted] = useState(false);
-  return (
-    <BootContext.Provider value={booted}>
-      {children}
-      <BootScreen onDone={() => setBooted(true)} />
-    </BootContext.Provider>
   );
 }

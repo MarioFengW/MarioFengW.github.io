@@ -88,7 +88,9 @@ export default function PageTransition() {
       if (!destination) return;
       event.preventDefault();
       if (rafId) finish(); // interrupt a running transition
-      if (reducedRef.current) {
+      // Keyboard activation (Enter on a link reports detail 0) and reduced
+      // motion jump instantly: never animate keyboard-initiated navigation.
+      if (reducedRef.current || event.detail === 0) {
         jumpTo(destination);
         return;
       }

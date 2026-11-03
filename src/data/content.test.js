@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { currentCity, experience, expertise, facts, highlights, profile, projects, socials } from './content';
+import { currentCity, experience, expertise, facts, profile, projects, socials } from './content';
 
 describe('content data', () => {
   it('has the profile fields the hero and footer render', () => {
@@ -39,12 +39,12 @@ describe('content data', () => {
     socials.forEach((s) => expect(s.href).toMatch(/^(https:\/\/|mailto:)/));
   });
 
-  it('highlights are positive numbers with a label and suffix', () => {
-    expect(highlights.length).toBeGreaterThan(0);
-    highlights.forEach((item) => {
-      expect(item.value).toBeGreaterThan(0);
-      expect(item.label).toBeTruthy();
-      expect(['%', '+']).toContain(item.suffix);
+  it('every impact metric is backed by its own description (no invented claims)', () => {
+    const withMetric = [...experience, ...projects].filter((item) => item.metric);
+    expect(withMetric.length).toBeGreaterThan(0);
+    withMetric.forEach((item) => {
+      const number = item.metric.split(' ')[0]; // e.g. "89.46%", "45,000+"
+      expect(item.description, item.title).toContain(number);
     });
   });
 

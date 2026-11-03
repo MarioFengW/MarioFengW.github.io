@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ScrollMeter from './ScrollMeter';
+import ThemeToggle from './ThemeToggle';
 
 export const navItems = ['about', 'expertise', 'experience', 'projects', 'contact'];
 
@@ -49,6 +50,7 @@ export default function Header() {
           <span className="caret" aria-hidden="true">_</span>
         </a>
         <ScrollMeter />
+        <ThemeToggle />
         <button
           type="button"
           className="nav-toggle"
@@ -67,7 +69,6 @@ export default function Header() {
                   onClick={() => setOpen(false)}
                   aria-current={active === item ? 'location' : undefined}
                 >
-                  <span className="link-index" aria-hidden="true">0{index + 1}</span>
                   <span className="link-label">{item}</span>
                 </a>
               </li>

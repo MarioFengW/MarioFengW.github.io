@@ -6,10 +6,6 @@ import SocialLinks from './SocialLinks';
 export default function Footer() {
   return (
     <footer id="contact" className="contact">
-      <p className="kicker">
-        <span className="kicker-index">05</span>
-        <span className="kicker-path">~/contact</span>
-      </p>
       {/* Headline font (Pixelta) has no apostrophe glyph, so keep display copy apostrophe-free. */}
       <ScrambleText as="h2" text="Get in touch" />
       <p className="contact-copy">

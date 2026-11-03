@@ -4,10 +4,7 @@ import { act, fireEvent, render, renderHook, screen } from '@testing-library/rea
 import PageTransition, { getHashTarget, jumpTo } from './PageTransition';
 import Header from './Header';
 import WeatherStatus from './WeatherStatus';
-import { DrawRule, useRiseVariants } from './Reveal';
 import { RAMP, cellNoise, sweepCoverage, wipeFrame } from '../lib/ascii';
-import { fadeVariants, riseVariants } from '../lib/motion-tokens';
-import { renderWithMotion } from '../test/render';
 import { mockAnimationFrame, mockIntersectionObserver, mockReducedMotion } from '../test/browser';
 
 const FULL = RAMP[RAMP.length - 1];
@@ -150,7 +147,7 @@ describe('PageTransition', () => {
   it('covers, jumps while covered, then reveals and cleans up', () => {
     const { raf, scroll, overlay } = setup();
     const link = screen.getByText('to about');
-    const notPrevented = fireEvent.click(link);
+    const notPrevented = fireEvent.click(link, { detail: 1 }); // pointer click
     expect(notPrevented).toBe(false); // default jump was replaced by the transition
     expect(overlay).toHaveClass('is-active');
 
@@ -175,10 +172,10 @@ describe('PageTransition', () => {
 
   it('a second click interrupts the running transition', () => {
     const { raf, scroll } = setup();
-    fireEvent.click(screen.getByText('to about'));
+    fireEvent.click(screen.getByText('to about'), { detail: 1 });
     raf.step(0);
     raf.step(50);
-    fireEvent.click(screen.getByText('to projects'));
+    fireEvent.click(screen.getByText('to projects'), { detail: 1 });
     expect(raf.pending()).toBe(1); // old loop cancelled, new one queued
     raf.step(1000);
     raf.step(1000 + 180);
@@ -188,8 +185,18 @@ describe('PageTransition', () => {
 
   it('jumps instantly with reduced motion', () => {
     const { raf, scroll, overlay } = setup({ reduced: true });
-    fireEvent.click(screen.getByText('to projects'));
+    fireEvent.click(screen.getByText('to projects'), { detail: 1 });
     expect(scroll).toHaveBeenCalledTimes(1);
+    expect(overlay).not.toHaveClass('is-active');
+    expect(raf.pending()).toBe(0);
+  });
+
+  it('jumps instantly for keyboard activation (never animate keyboard actions)', () => {
+    const { raf, scroll, overlay } = setup();
+    const prevented = !fireEvent.click(screen.getByText('to projects'), { detail: 0 }); // Enter on a link
+    expect(prevented).toBe(true);
+    expect(scroll).toHaveBeenCalledTimes(1);
+    expect(window.location.hash).toBe('#projects');
     expect(overlay).not.toHaveClass('is-active');
     expect(raf.pending()).toBe(0);
   });
@@ -246,27 +253,6 @@ describe('Header active section', () => {
     } finally {
       window.IntersectionObserver = original;
     }
-  });
-});
-
-describe('Reduced-motion variants', () => {
-  it('use a short opacity-only fade instead of a moving spring', () => {
-    mockReducedMotion(false);
-    expect(renderHook(() => useRiseVariants()).result.current).toBe(riseVariants);
-    mockReducedMotion(true);
-    expect(renderHook(() => useRiseVariants()).result.current).toBe(fadeVariants);
-    expect(fadeVariants.hidden).not.toHaveProperty('y');
-    expect(fadeVariants.visible.transition.duration).toBeLessThanOrEqual(0.2);
-  });
-});
-
-describe('DrawRule', () => {
-  it('is decorative and marked for the no-JS fallback', () => {
-    mockReducedMotion(true);
-    const { container } = renderWithMotion(<DrawRule />);
-    const rule = container.querySelector('.ascii-rule');
-    expect(rule).toHaveAttribute('aria-hidden', 'true');
-    expect(rule).toHaveAttribute('data-reveal');
   });
 });
 

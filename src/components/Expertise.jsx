@@ -1,22 +1,21 @@
 import React from 'react';
 import { expertise } from '../data/content';
 import SectionHeading from './SectionHeading';
-import { RevealItem, RevealList } from './Reveal';
 
+/** Areas of work as rows (title · what · stack), not a row of identical cards. */
 export default function Expertise() {
   return (
     <section id="expertise">
-      <SectionHeading index="02" kicker="expertise" title="What I work on" />
-      <RevealList as="ol" className="expertise-grid">
-        {expertise.map((item, index) => (
-          <RevealItem className="expertise-card" key={item.title}>
-            <p className="card-path">./0{index + 1}</p>
-            <h3>{item.title}</h3>
+      <SectionHeading title="What I work on" />
+      <ul className="expertise-list">
+        {expertise.map((item) => (
+          <li className="expertise-row" key={item.title}>
+            <h3 className="expertise-title">{item.title}</h3>
             <p className="expertise-desc">{item.description}</p>
-            <p className="tag">{item.tag}</p>
-          </RevealItem>
+            <p className="expertise-stack">{item.tag}</p>
+          </li>
         ))}
-      </RevealList>
+      </ul>
     </section>
   );
 }
