@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom/vitest';
 import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
+import { MotionGlobalConfig } from 'motion/react';
+
+// Motion animations complete instantly in tests, so assertions see end states.
+MotionGlobalConfig.skipAnimations = true;
 
 afterEach(() => {
   cleanup();
@@ -17,10 +21,20 @@ if (!window.matchMedia) {
   });
 }
 
-if (!window.IntersectionObserver) {
-  window.IntersectionObserver = class {
-    observe() {}
-    disconnect() {}
-    unobserve() {}
-  };
-}
+// Default: everything is "in view" shortly after being observed, like a tall
+// browser window. Tests that need control use mockIntersectionObserver().
+window.IntersectionObserver = class {
+  constructor(callback) {
+    this.callback = callback;
+    this.active = true;
+  }
+  observe(target) {
+    queueMicrotask(() => {
+      if (this.active) this.callback([{ target, isIntersecting: true, intersectionRatio: 1 }], this);
+    });
+  }
+  unobserve() {}
+  disconnect() {
+    this.active = false;
+  }
+};

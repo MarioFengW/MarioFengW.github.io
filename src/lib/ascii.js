@@ -81,6 +81,14 @@ export function scrambleText(target, progress, random = Math.random, glyphs = SC
   return out;
 }
 
+/** `[####......]  40%` style progress bar. Non-finite input counts as 0. */
+export function asciiProgress(progress, width = 16) {
+  const p = Number.isFinite(progress) ? clamp(progress, 0, 1) : 0;
+  const filled = Math.round(p * width);
+  const percent = String(Math.round(p * 100)).padStart(3, ' ');
+  return `[${'#'.repeat(filled)}${'.'.repeat(width - filled)}] ${percent}%`;
+}
+
 /** How many monospace cells are needed to cover a box. */
 export function gridSize(width, height, charWidth, lineHeight) {
   if (!charWidth || !lineHeight) return { cols: 0, rows: 0 };

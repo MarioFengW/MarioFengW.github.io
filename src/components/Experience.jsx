@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
+import { AnimatePresence, m } from 'motion/react';
 import { experience } from '../data/content';
+import { motionTokens } from '../lib/motion-tokens';
 import SectionHeading from './SectionHeading';
+import { RevealItem, RevealList } from './Reveal';
+
+// Height animates open/closed; content fades slightly behind it.
+const panelMotion = {
+  initial: { height: 0, opacity: 0 },
+  animate: { height: 'auto', opacity: 1 },
+  exit: { height: 0, opacity: 0 },
+  transition: { duration: motionTokens.duration.normal, ease: motionTokens.easing.smooth },
+};
 
 export default function Experience() {
   const [openIndex, setOpenIndex] = useState(0);
@@ -12,12 +23,12 @@ export default function Experience() {
   return (
     <section id="experience">
       <SectionHeading index="03" kicker="experience" title="Experience" />
-      <ol className="exp-log">
+      <RevealList as="ol" className="exp-log">
         {experience.map((item, index) => {
           const isOpen = openIndex === index;
           const panelId = `experience-panel-${index}`;
           return (
-            <li className={`exp-item${isOpen ? ' is-open' : ''}`} key={`${item.period}-${item.title}`}>
+            <RevealItem className={`exp-item${isOpen ? ' is-open' : ''}`} key={`${item.period}-${item.title}`}>
               <h3 className="exp-heading">
                 <button
                   type="button"
@@ -34,26 +45,32 @@ export default function Experience() {
                   <span className="exp-icon" aria-hidden="true">{isOpen ? '[-]' : '[+]'}</span>
                 </button>
               </h3>
-              <div className="exp-panel" id={panelId} role="region" aria-label={item.title} hidden={!isOpen}>
-                <div className="exp-meta">
-                  {item.location && <span>{item.location}</span>}
-                  {item.link && (
-                    <a href={item.link} target="_blank" rel="noopener noreferrer">
-                      {item.linkLabel || item.link} <span aria-hidden="true">↗</span>
-                    </a>
-                  )}
-                </div>
-                <p className="exp-desc">{item.description}</p>
-                {item.stack && (
-                  <ul className="stack" aria-label="Tech stack">
-                    {item.stack.map((tech) => <li key={tech}>{tech}</li>)}
-                  </ul>
+              <AnimatePresence initial={false}>
+                {isOpen && (
+                  <m.div key="panel" className="exp-panel" id={panelId} role="region" aria-label={item.title} {...panelMotion}>
+                    <div className="exp-panel-inner">
+                      <div className="exp-meta">
+                        {item.location && <span>{item.location}</span>}
+                        {item.link && (
+                          <a href={item.link} target="_blank" rel="noopener noreferrer">
+                            {item.linkLabel || item.link} <span aria-hidden="true">↗</span>
+                          </a>
+                        )}
+                      </div>
+                      <p className="exp-desc">{item.description}</p>
+                      {item.stack && (
+                        <ul className="stack" aria-label="Tech stack">
+                          {item.stack.map((tech) => <li key={tech}>{tech}</li>)}
+                        </ul>
+                      )}
+                    </div>
+                  </m.div>
                 )}
-              </div>
-            </li>
+              </AnimatePresence>
+            </RevealItem>
           );
         })}
-      </ol>
+      </RevealList>
     </section>
   );
 }

@@ -16,6 +16,14 @@ export const facts = [
   { key: 'offline', value: 'gaming · reading · music' },
 ];
 
+// Impact numbers shown as animated counters. Each one is backed by an entry below.
+export const highlights = [
+  { value: 89.46, decimals: 2, suffix: '%', label: 'F1 score · traffic classifier' },
+  { value: 45000, suffix: '+', label: 'contacts reached · AI campaigns' },
+  { value: 3000, suffix: '+', label: 'schools · Connect the Schools' },
+  { value: 90, suffix: '%', label: 'defect detection · Mask R-CNN' },
+];
+
 // Fixed location for the live ASCII weather widget (no geolocation prompt).
 export const currentCity = {
   name: 'Taipei',

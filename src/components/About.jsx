@@ -2,6 +2,8 @@ import React from 'react';
 import { currentCity, facts, profile } from '../data/content';
 import SectionHeading from './SectionHeading';
 import AsciiWeather from './AsciiWeather';
+import Highlights from './Highlights';
+import { Reveal, RevealItem, RevealList } from './Reveal';
 
 export default function About() {
   return (
@@ -9,18 +11,21 @@ export default function About() {
       <SectionHeading index="01" kicker="about" title="Hello, world" />
       <div className="about-grid">
         <div className="about-copy">
-          <p className="about-intro">{profile.intro}</p>
-          <dl className="facts">
+          <Reveal as="p" className="about-intro">{profile.intro}</Reveal>
+          <RevealList as="dl" className="facts">
             {facts.map((fact) => (
-              <div key={fact.key}>
+              <RevealItem as="div" key={fact.key}>
                 <dt>{fact.key}</dt>
                 <dd>{fact.value}</dd>
-              </div>
+              </RevealItem>
             ))}
-          </dl>
+          </RevealList>
         </div>
-        <AsciiWeather city={currentCity} />
+        <Reveal>
+          <AsciiWeather city={currentCity} />
+        </Reveal>
       </div>
+      <Highlights />
     </section>
   );
 }

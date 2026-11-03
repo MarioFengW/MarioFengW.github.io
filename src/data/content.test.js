@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { currentCity, experience, expertise, facts, profile, projects, socials } from './content';
+import { currentCity, experience, expertise, facts, highlights, profile, projects, socials } from './content';
 
 describe('content data', () => {
   it('has the profile fields the hero and footer render', () => {
@@ -37,6 +37,15 @@ describe('content data', () => {
     expect(new Set(labels).size).toBe(labels.length);
     expect(socials.filter((s) => s.primary).map((s) => s.label)).toEqual(['email', 'github', 'linkedin']);
     socials.forEach((s) => expect(s.href).toMatch(/^(https:\/\/|mailto:)/));
+  });
+
+  it('highlights are positive numbers with a label and suffix', () => {
+    expect(highlights.length).toBeGreaterThan(0);
+    highlights.forEach((item) => {
+      expect(item.value).toBeGreaterThan(0);
+      expect(item.label).toBeTruthy();
+      expect(['%', '+']).toContain(item.suffix);
+    });
   });
 
   it('the weather city has valid coordinates and a time zone', () => {
