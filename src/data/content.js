@@ -1,9 +1,39 @@
 export const profile = {
   name: 'Mario Feng Wu',
   role: 'Computer Science Engineering Student & AI/ML Developer',
-  intro: "I'm Mario, a Computer Science student originally from Guadalajara, Mexico, now based in Taipei for an exchange semester at NTU. My focus is AI/ML, full-stack development and cloud infrastructure, outside of that, you'll usually find me gaming, reading or with headphones on. Here's a look at what I've been building.",
+  summary: 'I build machine-learning models and the full-stack, cloud-deployed products around them.',
+  status: 'Open to internships & research collaborations',
+  intro: "I'm Mario, a Computer Science student originally from Guadalajara, Mexico, now based in Taipei for an exchange semester at NTU. My focus is AI/ML, full-stack development and cloud infrastructure. Outside of that, you'll usually find me gaming, reading or with headphones on. Here's a look at what I've been building.",
   location: 'Guadalajara, Mexico -> Taipei, Taiwan',
+  email: 'mario.fengw@gmail.com',
 };
+
+// Shown as a `key  value` block in the About section.
+export const facts = [
+  { key: 'based_in', value: 'Taipei, TW · NTU exchange' },
+  { key: 'from', value: 'Guadalajara, MX' },
+  { key: 'focus', value: 'AI/ML · full-stack · cloud' },
+  { key: 'offline', value: 'gaming · reading · music' },
+];
+
+// Fixed location for the live ASCII weather widget (no geolocation prompt).
+export const currentCity = {
+  name: 'Taipei',
+  latitude: 25.033,
+  longitude: 121.5654,
+  timeZone: 'Asia/Taipei',
+};
+
+// `primary` links appear in the hero; all of them appear in the contact footer.
+export const socials = [
+  { label: 'email', href: 'mailto:mario.fengw@gmail.com', primary: true },
+  { label: 'github', href: 'https://github.com/MarioFengW', primary: true },
+  { label: 'linkedin', href: 'https://www.linkedin.com/in/mariofengwu/', primary: true },
+  { label: 'discord', href: 'https://discord.com/users/1162141976813117490' },
+  { label: 'instagram', href: 'https://www.instagram.com/takatakata.195?stkn=cjJyenJrZm92dWVy' },
+  { label: 'facebook', href: 'https://www.facebook.com/share/19M41BFzVB/' },
+  { label: 'steam', href: 'https://steamcommunity.com/profiles/76561199147883762/' },
+];
 
 export const expertise = [
   {
