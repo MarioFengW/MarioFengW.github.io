@@ -6,10 +6,11 @@ import Expertise from '../components/Expertise';
 import Experience from '../components/Experience';
 import Projects from '../components/Projects';
 import Footer from '../components/Footer';
+import MotionProvider from '../components/MotionProvider';
 
 export default function HomePage() {
   return (
-    <>
+    <MotionProvider>
       <a className="skip-link" href="#about">Skip to content</a>
       <Header />
       <main>
@@ -22,7 +23,7 @@ export default function HomePage() {
           <Footer />
         </div>
       </main>
-    </>
+    </MotionProvider>
   );
 }
 
@@ -45,12 +46,6 @@ export function Head() {
       <meta property="og:description" content={DESCRIPTION} />
       <meta property="og:url" content={URL} />
       <meta name="twitter:card" content="summary" />
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap"
-      />
     </>
   );
 }

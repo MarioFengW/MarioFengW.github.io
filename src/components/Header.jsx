@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ScrollMeter from './ScrollMeter';
 
 export const navItems = ['about', 'expertise', 'experience', 'projects', 'contact'];
 
@@ -21,6 +22,7 @@ export default function Header() {
           <span className="nav-prompt" aria-hidden="true">~/</span>mario-feng-wu
           <span className="caret" aria-hidden="true">_</span>
         </a>
+        <ScrollMeter />
         <button
           type="button"
           className="nav-toggle"

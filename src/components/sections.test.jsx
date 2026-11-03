@@ -1,6 +1,7 @@
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render as renderPlain, screen, waitFor, within } from '@testing-library/react';
+import { renderWithMotion as render } from '../test/render';
 import Header, { navItems } from './Header';
 import Hero from './Hero';
 import About from './About';
@@ -52,9 +53,15 @@ describe('Header', () => {
 });
 
 describe('Hero', () => {
-  it('shows the name as the only h1, the role and both calls to action', () => {
+  it('shows the name as the only h1, the role and both calls to action', async () => {
     render(<Hero />);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('MarioFeng Wu');
+    expect(screen.getByText('whoami', { selector: '.sr-only' })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText(profile.summary)).toBeVisible());
+    // Every element the intro hides at first is marked so the no-JS stylesheet can show it.
+    document.querySelectorAll('.hero-content [style*="opacity"]').forEach((node) => {
+      expect(node).toHaveAttribute('data-reveal');
+    });
     expect(screen.getByText(profile.role)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /view projects/ })).toHaveAttribute('href', '#projects');
     expect(screen.getByRole('link', { name: /email me/ })).toHaveAttribute('href', `mailto:${profile.email}`);
@@ -98,22 +105,31 @@ describe('Expertise', () => {
 });
 
 describe('Experience', () => {
-  it('opens the first entry by default and works as an accordion', () => {
+  it('opens the first entry by default and works as an accordion', async () => {
     render(<Experience />);
     const buttons = screen.getAllByRole('button');
     expect(buttons).toHaveLength(experience.length);
     expect(buttons[0]).toHaveAttribute('aria-expanded', 'true');
     expect(buttons[1]).toHaveAttribute('aria-expanded', 'false');
-    expect(screen.getByText(experience[0].description)).toBeVisible();
+    expect(screen.getByRole('region', { name: experience[0].title })).toHaveTextContent(experience[0].description);
+    expect(screen.queryByText(experience[1].description)).toBeNull();
 
     fireEvent.click(buttons[1]);
     expect(buttons[0]).toHaveAttribute('aria-expanded', 'false');
     expect(buttons[1]).toHaveAttribute('aria-expanded', 'true');
-    expect(document.getElementById(buttons[0].getAttribute('aria-controls'))).not.toBeVisible();
-    expect(screen.getByText(experience[1].description)).toBeVisible();
+    expect(screen.getByText(experience[1].description)).toBeInTheDocument();
+    // The closing panel animates out, then unmounts.
+    await waitFor(() => expect(screen.queryByText(experience[0].description)).toBeNull());
 
     fireEvent.click(buttons[1]);
     buttons.forEach((button) => expect(button).toHaveAttribute('aria-expanded', 'false'));
+    await waitFor(() => expect(screen.queryAllByRole('region')).toHaveLength(0));
+  });
+
+  it('reveals each entry when the list scrolls into view', async () => {
+    render(<Experience />);
+    const items = screen.getAllByRole('listitem').filter((li) => li.classList.contains('exp-item'));
+    await waitFor(() => items.forEach((item) => expect(item).toBeVisible()));
   });
 
   it('links each organisation externally', () => {
@@ -165,8 +181,9 @@ describe('HomePage', () => {
     expect(screen.getByRole('link', { name: 'Skip to content' })).toHaveAttribute('href', '#about');
   });
 
-  it('Head sets title, description, canonical and Open Graph tags', () => {
-    const { container } = render(<Head />);
+  it('Head sets title, description, canonical and Open Graph tags without third-party fonts', () => {
+    const { container } = renderPlain(<Head />);
+    expect(container.querySelector('link[href*="fonts.googleapis"]')).toBeNull();
     expect(container.querySelector('title')).toHaveTextContent('Mario Feng Wu');
     expect(container.querySelector('meta[name="description"]').getAttribute('content')).toMatch(/machine-learning/);
     expect(container.querySelector('link[rel="canonical"]')).toHaveAttribute('href', 'https://mariofengw.github.io/');

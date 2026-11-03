@@ -1,17 +1,19 @@
 import React, { useEffect, useRef } from 'react';
 import { gridSize, renderTopoFrame } from '../lib/ascii';
-import useReducedMotion from '../hooks/useReducedMotion';
 
 const FRAME_MS = 1000 / 24; // ASCII reads best at a slightly "stepped" frame rate.
 
 /**
  * Animated ASCII topographic map. The pointer raises a hill in the field,
  * so the contour lines bend around the cursor. Purely decorative.
+ *
+ * `playing` is controlled by the parent (pause button / reduced motion).
+ * When paused it keeps showing the last frame instead of jumping.
  */
-export default function AsciiField({ className = '' }) {
+export default function AsciiField({ className = '', playing = true }) {
   const wrapRef = useRef(null);
   const preRef = useRef(null);
-  const reducedMotion = useReducedMotion();
+  const elapsedRef = useRef(0); // seconds of animation shown so far; survives pause/resume
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -25,7 +27,9 @@ export default function AsciiField({ className = '' }) {
     let isVisible = true;
     let target = null; // pointer position in cells
     let pointer = null; // eased pointer position
-    const start = performance.now();
+    let metrics = { charWidth: 0, lineHeight: 0 };
+    const runStart = performance.now();
+    const baseElapsed = elapsedRef.current;
 
     function measure() {
       const probe = document.createElement('span');
@@ -38,13 +42,16 @@ export default function AsciiField({ className = '' }) {
       const lineHeight = parseFloat(window.getComputedStyle(pre).lineHeight);
       const rect = wrap.getBoundingClientRect();
       ({ cols, rows } = gridSize(rect.width, rect.height, charWidth, lineHeight));
-      return { charWidth, lineHeight };
+      metrics = { charWidth, lineHeight };
     }
 
-    let metrics = measure();
+    function currentTime(now) {
+      return playing ? baseElapsed + (now - runStart) / 1000 : baseElapsed;
+    }
 
     function draw(now) {
-      const t = (now - start) / 1000;
+      const t = currentTime(now);
+      elapsedRef.current = t;
       if (target) {
         pointer = pointer
           ? { x: pointer.x + (target.x - pointer.x) * 0.12, y: pointer.y + (target.y - pointer.y) * 0.12 }
@@ -53,17 +60,17 @@ export default function AsciiField({ className = '' }) {
       pre.textContent = renderTopoFrame(cols, rows, t, pointer);
     }
 
+    function refresh() {
+      measure();
+      draw(performance.now());
+    }
+
     function loop(now) {
       rafId = requestAnimationFrame(loop);
       if (!isVisible || document.hidden) return;
       if (now - lastFrame < FRAME_MS) return;
       lastFrame = now;
       draw(now);
-    }
-
-    function handleResize() {
-      metrics = measure();
-      draw(performance.now());
     }
 
     function handlePointerMove(event) {
@@ -82,33 +89,43 @@ export default function AsciiField({ className = '' }) {
       };
     }
 
-    // Reduced motion: one static frame, no loop, no pointer tracking.
-    if (reducedMotion) {
-      draw(start + 12000);
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
+    refresh();
+
+    // Re-measure when the box changes size (not just the window) and once the
+    // web font has loaded, since the character width changes on font swap.
+    let resizeObserver;
+    if (typeof ResizeObserver === 'function') {
+      resizeObserver = new ResizeObserver(refresh);
+      resizeObserver.observe(wrap);
+    } else {
+      window.addEventListener('resize', refresh);
     }
+    let cancelled = false;
+    document.fonts?.ready?.then(() => {
+      if (!cancelled) refresh();
+    });
 
     let observer;
-    if ('IntersectionObserver' in window) {
-      observer = new IntersectionObserver(([entry]) => {
-        isVisible = entry.isIntersecting;
-      });
-      observer.observe(wrap);
+    if (playing) {
+      if ('IntersectionObserver' in window) {
+        observer = new IntersectionObserver(([entry]) => {
+          isVisible = entry.isIntersecting;
+        });
+        observer.observe(wrap);
+      }
+      rafId = requestAnimationFrame(loop);
+      window.addEventListener('pointermove', handlePointerMove, { passive: true });
     }
 
-    draw(start);
-    rafId = requestAnimationFrame(loop);
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('pointermove', handlePointerMove, { passive: true });
-
     return () => {
+      cancelled = true;
       cancelAnimationFrame(rafId);
       observer?.disconnect();
-      window.removeEventListener('resize', handleResize);
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', refresh);
       window.removeEventListener('pointermove', handlePointerMove);
     };
-  }, [reducedMotion]);
+  }, [playing]);
 
   return (
     <div ref={wrapRef} className={`ascii-field ${className}`.trim()} aria-hidden="true">

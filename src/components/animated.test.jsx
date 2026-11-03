@@ -243,14 +243,66 @@ describe('AsciiField', () => {
     }
   });
 
-  it('renders one static frame with reduced motion', () => {
-    mockReducedMotion(true);
+  it('renders one static frame and no loop while paused', () => {
     const raf = mockAnimationFrame();
-    const { container, unmount } = render(<AsciiField />);
+    const { container, unmount } = render(<AsciiField playing={false} />);
     expect(lines(container)).toHaveLength(4);
     expect(raf.pending()).toBe(0);
     window.dispatchEvent(new Event('resize'));
     expect(lines(container)).toHaveLength(4);
     unmount();
+  });
+
+  it('pausing freezes the current frame and resuming continues from it', () => {
+    mockIntersectionObserver();
+    const raf = mockAnimationFrame();
+    const { container, rerender } = render(<AsciiField playing />);
+    raf.step(3000); // t = 3s
+    const atPause = text(container);
+
+    performance.now.mockReturnValue(9000);
+    rerender(<AsciiField playing={false} />);
+    expect(text(container)).toBe(atPause); // frozen, not reset to t=0
+    expect(raf.pending()).toBe(0);
+
+    rerender(<AsciiField playing />);
+    expect(text(container)).toBe(atPause); // resumes from the same moment
+    raf.step(9000 + 2000);
+    expect(text(container)).not.toBe(atPause);
+  });
+
+  it('re-measures when its box resizes and after web fonts load', async () => {
+    let resizeCallback;
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(cb) { resizeCallback = cb; }
+      observe(...args) { observe(...args); }
+      disconnect() { disconnect(); }
+    });
+    let resolveFonts;
+    Object.defineProperty(document, 'fonts', {
+      configurable: true,
+      value: { ready: new Promise((resolve) => { resolveFonts = resolve; }) },
+    });
+    mockAnimationFrame();
+    try {
+      const { container, unmount } = render(<AsciiField playing={false} />);
+      expect(observe).toHaveBeenCalledWith(container.firstChild);
+      expect(lines(container)).toHaveLength(4);
+
+      Element.prototype.getBoundingClientRect.mockReturnValue({ ...rect, height: 90, bottom: 90 });
+      resizeCallback();
+      expect(lines(container)).toHaveLength(6); // 90 / 15
+
+      Element.prototype.getBoundingClientRect.mockReturnValue({ ...rect, height: 30, bottom: 30 });
+      await act(async () => resolveFonts());
+      expect(lines(container)).toHaveLength(2);
+
+      unmount();
+      expect(disconnect).toHaveBeenCalled();
+    } finally {
+      delete document.fonts;
+    }
   });
 });
