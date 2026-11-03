@@ -1,0 +1,256 @@
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { act, render, renderHook, screen } from '@testing-library/react';
+import AsciiField from './AsciiField';
+import AsciiWeather from './AsciiWeather';
+import ScrambleText from './ScrambleText';
+import useReducedMotion from '../hooks/useReducedMotion';
+import { WEATHER_ART } from '../lib/weather';
+import { mockAnimationFrame, mockIntersectionObserver, mockReducedMotion } from '../test/browser';
+
+const city = { name: 'Taipei', latitude: 25.033, longitude: 121.5654, timeZone: 'Asia/Taipei' };
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
+
+describe('useReducedMotion', () => {
+  it('follows the media query and its changes', () => {
+    const setReduced = mockReducedMotion(true);
+    const { result } = renderHook(() => useReducedMotion());
+    expect(result.current).toBe(true);
+    act(() => setReduced(false));
+    expect(result.current).toBe(false);
+  });
+});
+
+describe('ScrambleText', () => {
+  it('exposes the real text to assistive tech and hides the animated copy', () => {
+    mockReducedMotion(false);
+    mockIntersectionObserver();
+    render(<ScrambleText as="h2" text="Selected projects" />);
+    const heading = screen.getByRole('heading', { level: 2, name: 'Selected projects' });
+    expect(heading.querySelector('[aria-hidden="true"]')).toHaveTextContent('Selected projects');
+  });
+
+  it('decodes once when scrolled into view and ends on the real text', () => {
+    mockReducedMotion(false);
+    const io = mockIntersectionObserver();
+    const raf = mockAnimationFrame();
+    vi.spyOn(performance, 'now').mockReturnValue(0);
+    render(<ScrambleText text="Experience" />);
+    const visual = screen.getByText('Experience', { selector: '[aria-hidden="true"]' });
+
+    io.trigger(false);
+    expect(raf.pending()).toBe(0);
+
+    io.trigger(true);
+    raf.step(100); // mid-animation
+    expect(visual.textContent).not.toBe('Experience');
+    expect(visual.textContent).toHaveLength('Experience'.length);
+    expect(visual.textContent.startsWith('E')).toBe(true);
+
+    raf.step(120); // under STEP_MS: text not re-rolled, loop continues
+    expect(raf.pending()).toBe(1);
+
+    raf.step(800); // done
+    expect(visual.textContent).toBe('Experience');
+    expect(raf.pending()).toBe(0);
+
+    io.trigger(true); // observer disconnected; does not replay
+    expect(raf.pending()).toBe(0);
+  });
+
+  it('restores the text if unmounted mid-animation', () => {
+    mockReducedMotion(false);
+    const io = mockIntersectionObserver();
+    const raf = mockAnimationFrame();
+    vi.spyOn(performance, 'now').mockReturnValue(0);
+    const { unmount } = render(<ScrambleText text="About" />);
+    const visual = screen.getByText('About', { selector: '[aria-hidden="true"]' });
+    io.trigger(true);
+    raf.step(100);
+    unmount();
+    expect(visual.textContent).toBe('About');
+    expect(raf.pending()).toBe(0);
+  });
+
+  it('does not animate with reduced motion', () => {
+    mockReducedMotion(true);
+    const io = mockIntersectionObserver();
+    render(<ScrambleText text="Contact" />);
+    expect(io.instances.every((o) => o.disconnected || o.targets.length === 0)).toBe(true);
+  });
+});
+
+describe('AsciiWeather', () => {
+  beforeEach(() => {
+    mockReducedMotion(false);
+  });
+
+  it('shows a loading state, then the live reading', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ current: { temperature_2m: 27.2, weather_code: 0, wind_speed_10m: 3, is_day: 1 } }),
+    });
+    const { container } = render(<AsciiWeather city={city} fetchImpl={fetchImpl} />);
+    expect(screen.getByText('fetching…')).toBeInTheDocument();
+    expect(await screen.findByText('27°C · Clear sky')).toBeInTheDocument();
+    const figure = container.querySelector('figure');
+    expect(figure).toHaveAttribute('data-status', 'ready');
+    expect(figure).toHaveAttribute('data-type', 'sun');
+    expect(screen.getByText(/^\d{2}:\d{2}$/)).toBeInTheDocument();
+  });
+
+  it('falls back gracefully when the request fails', async () => {
+    const fetchImpl = vi.fn().mockRejectedValue(new Error('offline'));
+    const { container } = render(<AsciiWeather city={city} fetchImpl={fetchImpl} />);
+    expect(await screen.findByText('weather offline')).toBeInTheDocument();
+    expect(container.querySelector('figure')).toHaveAttribute('data-status', 'error');
+  });
+
+  it('uses window.fetch when no fetch implementation is passed', async () => {
+    const fetchSpy = vi.fn().mockRejectedValue(new Error('offline'));
+    vi.stubGlobal('fetch', fetchSpy);
+    render(<AsciiWeather city={city} />);
+    expect(await screen.findByText('weather offline')).toBeInTheDocument();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores results that arrive after unmount', async () => {
+    const consoleError = vi.spyOn(console, 'error');
+    let resolve;
+    let reject;
+    const ok = vi.fn(() => new Promise((r) => { resolve = r; }));
+    const fail = vi.fn(() => new Promise((_r, j) => { reject = j; }));
+    render(<AsciiWeather city={city} fetchImpl={ok} />).unmount();
+    render(<AsciiWeather city={city} fetchImpl={fail} />).unmount();
+    await act(async () => {
+      resolve({ ok: true, json: async () => ({ current: { temperature_2m: 1, weather_code: 0, is_day: 1 } }) });
+      reject(new Error('late'));
+    });
+    expect(consoleError).not.toHaveBeenCalled();
+  });
+
+  it('alternates animation frames, unless reduced motion is on', () => {
+    vi.useFakeTimers();
+    const pending = vi.fn(() => new Promise(() => {})); // stays loading -> cloud art
+    const { container, unmount } = render(<AsciiWeather city={city} fetchImpl={pending} />);
+    const art = (root) => root.querySelector('.weather-art').textContent;
+    expect(art(container)).toBe(WEATHER_ART.cloud[0].join('\n'));
+    act(() => vi.advanceTimersByTime(650));
+    expect(art(container)).toBe(WEATHER_ART.cloud[1].join('\n'));
+    unmount();
+
+    mockReducedMotion(true);
+    const reduced = render(<AsciiWeather city={city} fetchImpl={pending} />);
+    act(() => vi.advanceTimersByTime(2000));
+    expect(art(reduced.container)).toBe(WEATHER_ART.cloud[0].join('\n'));
+  });
+});
+
+describe('AsciiField', () => {
+  const rect = { left: 0, top: 0, right: 160, bottom: 60, width: 160, height: 60, x: 0, y: 0 };
+  const FRAME = 1000 / 24;
+
+  beforeEach(() => {
+    // Box is 160x60; the 20-char probe measures 160px -> 8px per char; line height 15px.
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(rect);
+    const realGetComputedStyle = window.getComputedStyle.bind(window);
+    vi.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
+      const style = realGetComputedStyle(el);
+      return { ...style, lineHeight: '15px' };
+    });
+    vi.spyOn(performance, 'now').mockReturnValue(0);
+  });
+
+  const text = (container) => container.querySelector('pre').textContent;
+  const lines = (container) => text(container).split('\n');
+
+  it('fills its box with a decorative ASCII frame and animates', () => {
+    mockReducedMotion(false);
+    const io = mockIntersectionObserver();
+    const raf = mockAnimationFrame();
+    const { container } = render(<AsciiField className="hero-field" />);
+    const wrap = container.firstChild;
+    expect(wrap).toHaveAttribute('aria-hidden', 'true');
+    expect(wrap).toHaveClass('ascii-field', 'hero-field');
+
+    expect(lines(container)).toHaveLength(4); // 60 / 15
+    expect(lines(container)[0]).toHaveLength(20); // 160 / 8
+    const first = text(container);
+
+    raf.step(10); // throttled: too soon after the last frame
+    expect(text(container)).toBe(first);
+
+    raf.step(5000);
+    expect(text(container)).not.toBe(first);
+
+    io.trigger(false); // offscreen: stop drawing
+    const offscreen = text(container);
+    raf.step(9000);
+    expect(text(container)).toBe(offscreen);
+  });
+
+  it('bends the field toward the pointer and forgets it when it leaves', () => {
+    mockReducedMotion(false);
+    mockIntersectionObserver();
+    const raf = mockAnimationFrame();
+    const { container } = render(<AsciiField />);
+
+    raf.step(1000);
+    raf.step(1000 + FRAME + 1);
+    const withoutPointer = text(container);
+
+    // Same timestamps again, but with the pointer in the middle of the box.
+    const { container: other } = render(<AsciiField />);
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 80, clientY: 30 }));
+    raf.step(1000);
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 90, clientY: 30 }));
+    raf.step(1000 + FRAME + 1); // eased update toward the new target
+    expect(text(other)).not.toBe(withoutPointer);
+
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 999, clientY: 999 }));
+    raf.step(5000);
+    expect(lines(other)).toHaveLength(4);
+  });
+
+  it('re-measures on resize and cleans up on unmount', () => {
+    mockReducedMotion(false);
+    mockIntersectionObserver();
+    const raf = mockAnimationFrame();
+    const removeSpy = vi.spyOn(window, 'removeEventListener');
+    const { container, unmount } = render(<AsciiField />);
+    window.dispatchEvent(new Event('resize'));
+    expect(lines(container)).toHaveLength(4);
+    unmount();
+    expect(raf.pending()).toBe(0);
+    expect(removeSpy).toHaveBeenCalledWith('pointermove', expect.any(Function));
+  });
+
+  it('works without IntersectionObserver support', () => {
+    mockReducedMotion(false);
+    const original = window.IntersectionObserver;
+    delete window.IntersectionObserver;
+    try {
+      const raf = mockAnimationFrame();
+      const { container } = render(<AsciiField />);
+      raf.step(5000);
+      expect(lines(container)).toHaveLength(4);
+    } finally {
+      window.IntersectionObserver = original;
+    }
+  });
+
+  it('renders one static frame with reduced motion', () => {
+    mockReducedMotion(true);
+    const raf = mockAnimationFrame();
+    const { container, unmount } = render(<AsciiField />);
+    expect(lines(container)).toHaveLength(4);
+    expect(raf.pending()).toBe(0);
+    window.dispatchEvent(new Event('resize'));
+    expect(lines(container)).toHaveLength(4);
+    unmount();
+  });
+});
