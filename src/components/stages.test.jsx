@@ -4,6 +4,7 @@ import { act, render } from '@testing-library/react';
 import Expertise from './Expertise';
 import AsciiFlow from './AsciiFlow';
 import { mockAnimationFrame, mockIntersectionObserver, mockReducedMotion } from '../test/browser';
+import { getFocus, setActiveSection } from '../lib/nebulaFocus';
 
 function placeSteps(container, centers) {
   container.querySelectorAll('.stage-step').forEach((step, index) => {
@@ -28,7 +29,9 @@ describe('Expertise stage', () => {
       raf.step(16);
     });
     expect(steps[2]).toHaveClass('is-active');
-    expect(container.querySelector('.stage-caption').textContent).toContain('deploy');
+    setActiveSection(null);
+    setActiveSection('expertise');
+    expect(getFocus().label).toContain('deploy');
   });
 });
 

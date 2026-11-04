@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { profile } from '../data/content';
 import useReducedMotion from '../hooks/useReducedMotion';
-import AsciiField from './AsciiField';
+import useNebulaFocus from '../hooks/useNebulaFocus';
+import { setPaused } from '../lib/nebulaFocus';
+import { heroGas } from '../lib/stages';
 
 /**
  * Hero. Content is visible in the default state (no script-dependent hiding):
  * the boot screen dissolving over it is the page's one entrance moment.
  */
+const HERO_FOCUS = { key: 'hero', shape: heroGas, label: '' };
+
 export default function Hero() {
   const [first, ...rest] = profile.name.split(' ');
   const reducedMotion = useReducedMotion();
   const [playing, setPlaying] = useState(true);
+  useNebulaFocus('top', HERO_FOCUS);
+
+  useEffect(() => {
+    setPaused(!playing);
+  }, [playing]);
 
   // Respect the OS setting by default; the visitor can still press play.
   useEffect(() => {
@@ -19,7 +28,6 @@ export default function Hero() {
 
   return (
     <section className="hero" id="top">
-      <AsciiField className="hero-field" playing={playing} />
       <div className="hero-content">
         <h1>
           {first}

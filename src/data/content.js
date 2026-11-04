@@ -106,6 +106,7 @@ export const projects = [
     description: 'AI-powered project management platform with a RAG reporting pipeline, deployed on OCI with automated CI/CD and end-to-end testing.',
     stack: ['React', 'Java', 'OCI', 'Docker'],
     link: 'https://github.com/JRV-XVI/oci-chatbot',
+    shape: 'documents funnelled into answers',
     diagram: [
       '[ react ] --> [ java api ] --> [ rag reports ]',
       '                   |',
@@ -119,6 +120,7 @@ export const projects = [
     description: 'Digital transformation platform for Banco de Alimentos Jalisco, coordinating donors, drivers and admins with real-time state tracking and vehicle matching.',
     stack: ['React Native', 'TypeScript', 'Supabase'],
     link: 'https://github.com/JRV-XVI/in-and-out',
+    shape: 'one hub, routes fanning out',
     diagram: [
       'donors  --\\',
       'drivers ---> [ live state ] --> vehicle match',
@@ -133,6 +135,7 @@ export const projects = [
     description: 'Educational support platform connecting 3,000+ schools with partners through similarity-based needs matching.',
     stack: ['React', 'Node.js', 'PostgreSQL'],
     link: 'https://github.com/JRV-XVI/connect-the-schools',
+    shape: 'schools matched to partners',
     diagram: [
       'schools <--> [ needs matching ] <--> partners',
       '  3,000+         similarity',
@@ -145,6 +148,7 @@ export const projects = [
     description: "Built the website for PawnGuard's Capture The Flag competition, where players solve web exploitation, reverse engineering and cryptography challenges.",
     stack: ['React', 'Next.js', 'TailwindCSS', 'TypeScript'],
     link: 'https://hack.pawnguard.org',
+    shape: 'flag captured',
     diagram: [
       'web    --\\',
       'rev    ---> exploit --> { flag }',

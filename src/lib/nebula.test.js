@@ -9,7 +9,6 @@ import {
   smoothstep,
   valueNoise,
 } from './nebula';
-import { WEATHER_SCENES, isFlash, renderWeatherField } from './weatherField';
 
 describe('noise primitives', () => {
   it('lattice values are deterministic, in 0..1, and wrap every 256 cells', () => {
@@ -108,44 +107,5 @@ describe('renderNebulaLayers', () => {
 
   it('returns empty layers for an empty grid', () => {
     expect(renderNebulaLayers(0, 10, 1)).toEqual(['', '', '', '']);
-  });
-});
-
-describe('renderWeatherField', () => {
-  it.each(WEATHER_SCENES)('%s: right size, has glyphs, animates', (type) => {
-    const a = renderWeatherField(type, 90, 30, 2);
-    const lines = a.text.split('\n');
-    expect(lines).toHaveLength(30);
-    lines.forEach((line) => expect(line).toHaveLength(90));
-    expect(a.text.replace(/\s/g, '').length).toBeGreaterThan(0);
-    expect(renderWeatherField(type, 90, 30, 2).text).toBe(a.text); // deterministic
-    expect(renderWeatherField(type, 90, 30, 4.7).text).not.toBe(a.text);
-  });
-
-  it('rain falls: drops are drawn and move between frames', () => {
-    const rows = renderWeatherField('rain', 60, 30, 1).text.split('\n');
-    expect(rows.some((row) => row.includes('/'))).toBe(true);
-    expect(renderWeatherField('rain', 60, 30, 1).text).not.toBe(renderWeatherField('rain', 60, 30, 1.05).text);
-  });
-
-  it('storms are heavier than rain and flash periodically', () => {
-    const count = (s) => s.replace(/[^/]/g, '').length;
-    expect(count(renderWeatherField('thunder', 120, 40, 3).text)).toBeGreaterThan(count(renderWeatherField('rain', 120, 40, 3).text));
-    expect(renderWeatherField('thunder', 20, 5, 6.04).flash).toBe(true);
-    expect(renderWeatherField('thunder', 20, 5, 3).flash).toBe(false);
-    expect(renderWeatherField('rain', 20, 5, 6.04).flash).toBe(false);
-  });
-
-  it('isFlash fires twice at the start of every 6s cycle', () => {
-    expect(isFlash(0.02)).toBe(true);
-    expect(isFlash(0.12)).toBe(false);
-    expect(isFlash(0.2)).toBe(true);
-    expect(isFlash(3)).toBe(false);
-    expect(isFlash(12.05)).toBe(true);
-  });
-
-  it('falls back to clouds for unknown types and handles an empty grid', () => {
-    expect(renderWeatherField('volcano', 40, 12, 1).text).toBe(renderWeatherField('cloud', 40, 12, 1).text);
-    expect(renderWeatherField('rain', 0, 12, 1)).toEqual({ text: '', flash: false });
   });
 });

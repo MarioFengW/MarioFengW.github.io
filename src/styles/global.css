@@ -198,10 +198,6 @@ ul, ol { list-style: none; }
 .nebula-rose { color: var(--neb-rose); }
 .nebula-core { color: var(--neb-core); text-shadow: 0 0 6px var(--neb-glow); }
 /* Dense on the right, quiet behind the copy on the left. */
-.hero-field {
-  -webkit-mask-image: linear-gradient(100deg, rgba(0, 0, 0, .12) 0%, rgba(0, 0, 0, .25) 40%, #000 75%);
-  mask-image: linear-gradient(100deg, rgba(0, 0, 0, .12) 0%, rgba(0, 0, 0, .25) 40%, #000 75%);
-}
 .hero-content {
   position: relative; z-index: 1;
   width: 100%; max-width: var(--max); margin: 0 auto;
@@ -286,24 +282,6 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .facts dd { color: var(--ink-dim); }
 
 /* The live sky over Taipei fills the whole About section, edge to edge. */
-.weather-backdrop {
-  position: absolute; z-index: 0; top: 0; bottom: 0;
-  left: calc(50% - 50vw); width: 100vw; overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 80%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 80%, transparent 100%);
-  transition: background-color var(--dur-press);
-}
-.weather-backdrop-pre {
-  margin: 0; color: var(--accent); opacity: .5;
-  font: 400 var(--cell-font)/var(--cell-line) var(--mono); white-space: pre; user-select: none;
-  transition: color var(--dur-ambient) var(--ease), opacity var(--dur-ambient) var(--ease);
-}
-.weather-backdrop[data-type='sun'] .weather-backdrop-pre { color: var(--signal); opacity: .32; }
-.weather-backdrop[data-type='night'] .weather-backdrop-pre { color: var(--neb-core); opacity: .5; }
-.weather-backdrop[data-type='snow'] .weather-backdrop-pre { color: var(--ink); opacity: .45; }
-.weather-backdrop[data-type='thunder'] .weather-backdrop-pre { opacity: .5; }
-.weather-backdrop.is-flash { background-color: var(--flash); }
-.weather-backdrop.is-flash .weather-backdrop-pre { opacity: .85; color: var(--ink); transition: none; }
 
 .weather-status {
   padding: 18px 20px; border: 1px solid var(--line-strong);
@@ -323,29 +301,8 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .weather-status-note { margin-top: 12px; color: var(--ink-faint); font-size: var(--fs-xs); }
 
 /* ---------------------------------------------------------- expertise --- */
-/* Scrollytelling over the whole section: the nebula is a sticky, full-bleed
-   background (one screen tall, pulled out of the flow by a negative margin) and
-   the steps scroll over it on the right. The gas takes its shape on the left. */
-.stages, .exp-section { position: relative; clip-path: inset(0 -100vw); } /* keep the sticky background inside the section vertically; full bleed sideways */
-.stage-bg {
-  position: sticky; top: 0; z-index: 0;
-  height: 100svh; margin-bottom: -100svh;
-  width: 100vw; margin-left: calc(50% - 50vw);
-  overflow: hidden;
-}
-/* Edge fades painted once (static overlays), not a mask re-composited per frame. */
-.stage-bg::before, .stage-bg::after {
-  content: ''; position: absolute; left: 0; right: 0; height: 14%;
-  z-index: 1; pointer-events: none;
-}
-.stage-bg::before { top: 0; background: linear-gradient(to bottom, var(--bg), transparent); }
-.stage-bg::after { bottom: 0; background: linear-gradient(to top, var(--bg), transparent); }
-.stage-hud { z-index: 2; padding: 8px 12px; background: var(--bg); }
-.stage-hud {
-  position: absolute; bottom: 16%; left: max(var(--gutter), calc(50vw - var(--max) / 2 + var(--gutter)));
-  display: grid; gap: 8px;
-}
-.stage-caption { margin: 0; color: var(--ink-dim); font-size: var(--fs-xs); }
+/* Scrollytelling: the steps scroll over the page nebula, which re-forms per step. */
+.stages, .exp-section { position: relative; }
 .stage-pipeline pre { color: var(--ink-faint); }
 .stage-steps {
   position: relative; z-index: 1;
@@ -446,7 +403,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   position: relative; overflow: hidden; isolation: isolate;
   display: flex; flex-direction: column;
   padding: clamp(20px, 3vw, 32px);
-  border: 1px solid var(--line-strong); background: var(--bg-raised);
+  border: 1px solid var(--line-strong); background: color-mix(in srgb, var(--bg-raised) 90%, transparent); /* the project's shape shows faintly through */
   transform-origin: 50% 0;
 }
 .project-shade {
@@ -549,8 +506,6 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 @media (max-width: 860px) {
   .stage-steps { width: 100%; }
   .stage-step { min-height: 70svh; }
-  .nebula-stage { opacity: .3; }
-  .stage-hud { bottom: 10%; }
   .nav-toggle { display: block; }
   /* Menu drops in (opacity + small translate), items follow with a 40ms stagger.
      visibility keeps closed links out of the tab order without display:none. */
@@ -576,15 +531,10 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   .project-body { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
-  .nebula-stage { --cell-font: 15px; --cell-line: 17px; } /* fewer cells per frame on phones */
+  .page-nebula { --cell-font: 15px; --cell-line: 17px; } /* fewer cells per frame on phones */
   .contact-route-handle { display: none; }
   .contact-routes li:first-child .contact-route-handle { display: inline; font-size: var(--fs-xs); }
   body { font-size: 14px; }
-  .hero-field {
-    /* The nebula is vivid: keep it strong above the copy, faint behind it. */
-    -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, .35) 24%, rgba(0, 0, 0, .12) 42%, rgba(0, 0, 0, .12) 100%);
-    mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, .35) 24%, rgba(0, 0, 0, .12) 42%, rgba(0, 0, 0, .12) 100%);
-  }
   .hero-content { padding-top: 120px; }
   .theme-toggle-label { display: none; }
   .exp-header { grid-template-columns: 2ch minmax(0, 1fr) 3ch; gap: 4px 10px; }
@@ -604,7 +554,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   .btn:active, .socials a:active, .nav-toggle:active, .theme-toggle:active, .project-cta:active { transform: none; }
   .links, .links.is-open, .links li, .links.is-open li { transform: none; transition-delay: 0s; }
   .page-transition { display: none; }
-  .hero-content, .hero-field { animation: none !important; }
+  .hero-content { animation: none !important; }
   ::view-transition-new(root) { animation: none; }
 }
 
@@ -637,19 +587,16 @@ html[data-booted] .boot { display: none; }
    shorthand landing after `animation-timeline` would reset it to `auto`. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .hero-content, .hero-field {
+    .hero-content {
       animation-duration: auto;
       animation-timing-function: linear;
       animation-fill-mode: both;
       animation-timeline: view();
     }
     .hero-content { animation-name: hero-exit; animation-range: exit 0% exit 90%; }
-    .hero-field { animation-name: field-exit; animation-range: exit 0% exit 100%; }
   }
 }
 @keyframes hero-exit { to { opacity: 0; transform: translateY(-48px); } }
-/* Parallax: the gas drifts down while the page scrolls up, so it lags behind the copy. */
-@keyframes field-exit { to { opacity: .2; transform: translateY(32%) scale(1.06); } }
 
 /* Touch: social links get a full 44px target. */
 @media (pointer: coarse) {
@@ -707,4 +654,21 @@ html[data-booted] .boot { display: none; }
 .exp-timeline { padding: 8px clamp(12px, 2vw, 20px); }
 /* Wide screens: the timeline on the left, the role's shape in the gas on the right. */
 @media (min-width: 1100px) { .exp-timeline { width: min(62%, 760px); } }
-.exp-section .stage-hud { left: auto; right: max(var(--gutter), calc(50vw - var(--max) / 2 + var(--gutter))); }
+
+/* ------------------------------------------------------- page nebula --- */
+/* One fixed nebula behind the whole page. Sections never paint their own
+   background over it, so moving between them shows no seams: the same gas
+   simply re-forms (see PageNebula.jsx). */
+.page-nebula { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.page-nebula-field { position: absolute; inset: 0; }
+main { position: relative; z-index: 1; }
+.stage-pipeline { margin: -24px 0 32px; }
+.stage-pipeline pre { color: var(--ink-faint); }
+.nebula-hud {
+  position: absolute; left: var(--gutter); bottom: 16px; margin: 0;
+  padding: 6px 10px; background: var(--bg); color: var(--ink-dim); font-size: var(--fs-xs);
+}
+/* Copy that sits on open gas gets the same quiet panel as the steps. */
+.about-copy, .contact-map, .contact-copy { background: color-mix(in srgb, var(--bg) 84%, transparent); padding: 16px clamp(12px, 2vw, 20px); }
+.contact-map, .contact-copy { width: fit-content; max-width: 100%; }
+.hero-content > * { position: relative; }

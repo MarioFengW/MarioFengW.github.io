@@ -9,12 +9,14 @@ import Footer from '../components/Footer';
 import PageTransition from '../components/PageTransition';
 import BootScreen from '../components/BootScreen';
 import SectionDivider from '../components/SectionDivider';
+import PageNebula from '../components/PageNebula';
 
 export default function HomePage() {
   return (
     <>
       {/* Skip link must act instantly, so it opts out of the section transition. */}
       <a className="skip-link" href="#about" data-no-transition="">Skip to content</a>
+      <PageNebula />
       <PageTransition />
       <Header />
       <main>

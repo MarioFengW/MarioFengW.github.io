@@ -3,6 +3,8 @@ import { projects } from '../data/content';
 import { stackCover, stackDepth } from '../lib/scrollMath';
 import useScrollLinked from '../hooks/useScrollLinked';
 import useReducedMotion from '../hooks/useReducedMotion';
+import useNebulaFocus from '../hooks/useNebulaFocus';
+import { PROJECT_SHAPES } from '../lib/stages';
 import AsciiFlow from './AsciiFlow';
 import SectionHeading from './SectionHeading';
 
@@ -27,6 +29,29 @@ function finePointer() {
 export default function Projects() {
   // The hovered card's diagram runs at double speed (fine pointers only).
   const [hovered, setHovered] = useState(null);
+  // The card on top of the stack: the last one whose top has reached the upper
+  // part of the screen. It (or the hovered card) gives the page nebula its shape.
+  const [onTop, setOnTop] = useState(0);
+  const onTopRef = useRef(0);
+  const pickOnTop = useCallback((stack) => {
+    const line = window.innerHeight * 0.45;
+    let top = 0;
+    stack.querySelectorAll('.project-card').forEach((card, index) => {
+      if (card.getBoundingClientRect().top <= line) top = index;
+    });
+    if (top !== onTopRef.current) {
+      onTopRef.current = top;
+      setOnTop(top);
+    }
+  }, []);
+  const hoveredIndex = projects.findIndex((project) => project.title === hovered);
+  const focusIndex = hoveredIndex >= 0 ? hoveredIndex : onTop;
+  const focusProject = projects[focusIndex];
+  useNebulaFocus('projects', {
+    key: `project-${focusIndex}`,
+    shape: PROJECT_SHAPES[focusIndex % PROJECT_SHAPES.length],
+    label: `[ ${slugify(focusProject.title)} ] ${focusProject.shape}`,
+  });
   const stackRef = useRef(null);
   const reducedMotion = useReducedMotion();
 
@@ -41,6 +66,7 @@ export default function Projects() {
   }, []);
 
   useScrollLinked(stackRef, update, { enabled: !reducedMotion });
+  useScrollLinked(stackRef, pickOnTop);
 
   // The media query resolves after the first render: clear any depth already applied.
   useEffect(() => {

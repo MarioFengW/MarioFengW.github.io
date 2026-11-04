@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import BootScreen, { BOOT_LINES, BOOT_LOG_MS, bootLog } from './BootScreen';
 import SectionDivider, { dividerFrame, dividerProgress } from './SectionDivider';
-import WeatherBackdrop from './WeatherBackdrop';
 import About from './About';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -197,33 +196,6 @@ describe('SectionDivider', () => {
   });
 });
 
-describe('WeatherBackdrop', () => {
-  beforeEach(mockLayout);
-
-  it('draws the scene for its type and flashes during storms', () => {
-    mockReducedMotion(false);
-    mockIntersectionObserver();
-    const raf = mockAnimationFrame();
-    vi.spyOn(performance, 'now').mockReturnValue(0);
-    const { container } = render(<WeatherBackdrop type="thunder" />);
-    const wrap = container.querySelector('.weather-backdrop');
-    expect(wrap).toHaveAttribute('data-type', 'thunder');
-    expect(wrap).toHaveAttribute('aria-hidden', 'true');
-    expect(container.querySelector('pre').textContent.split('\n')).toHaveLength(4);
-    expect(wrap).toHaveClass('is-flash'); // t = 0 is a flash
-
-    raf.step(3000); // mid-cycle
-    expect(wrap).not.toHaveClass('is-flash');
-  });
-
-  it('holds a static frame when not playing', () => {
-    const raf = mockAnimationFrame();
-    const { container } = render(<WeatherBackdrop type="snow" playing={false} />);
-    expect(container.querySelector('pre').textContent.length).toBeGreaterThan(0);
-    expect(raf.pending()).toBe(0);
-  });
-});
-
 describe('About with live weather', () => {
   beforeEach(mockLayout);
 
@@ -235,10 +207,10 @@ describe('About with live weather', () => {
       json: async () => ({ current: { temperature_2m: 26.4, weather_code: 63, wind_speed_10m: 4, is_day: 1 } }),
     });
     const { container } = render(<About fetchImpl={fetchImpl} />);
-    expect(container.querySelector('.weather-backdrop')).toHaveAttribute('data-type', 'cloud'); // while loading
+    expect(container.querySelector('#about')).toHaveAttribute('data-weather', 'cloud'); // while loading
     expect(await screen.findByText('Rain')).toBeInTheDocument();
     expect(container.querySelector('.weather-status-temp')).toHaveTextContent('26°C');
-    expect(container.querySelector('.weather-backdrop')).toHaveAttribute('data-type', 'rain');
+    expect(container.querySelector('#about')).toHaveAttribute('data-weather', 'rain');
     expect(screen.getByRole('complementary', { name: 'Weather in Taipei' })).toBeInTheDocument();
   });
 
@@ -247,9 +219,8 @@ describe('About with live weather', () => {
     const raf = mockAnimationFrame();
     const { container } = render(<About fetchImpl={vi.fn().mockRejectedValue(new Error('offline'))} />);
     expect(await screen.findByText('weather offline')).toBeInTheDocument();
-    expect(container.querySelector('.weather-backdrop')).toHaveAttribute('data-type', 'cloud');
+    expect(container.querySelector('#about')).toHaveAttribute('data-weather', 'cloud');
     expect(container.querySelector('.weather-status-temp')).toHaveTextContent('--°C');
-    expect(raf.pending()).toBe(0); // reduced motion: static backdrop
   });
 
   it('uses window.fetch by default and ignores results after unmount', async () => {
