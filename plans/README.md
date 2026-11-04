@@ -7,7 +7,7 @@ Written from a motion audit at commit `d9d3755`. Each plan is self-contained; ru
 | 001 | [Even packet steps](001-even-packet-steps.md) | HIGH | DONE |
 | 002 | [Stage follows scroll](002-stage-follows-scroll.md) | HIGH | DONE |
 | 003 | [Cheaper stage paint](003-cheaper-stage-paint.md) | HIGH | DONE |
-| 004 | [Scroll snap decision](004-scroll-snap-decision.md) | MEDIUM | TODO (device test) |
+| 004 | [Scroll snap decision](004-scroll-snap-decision.md) | MEDIUM | DONE (removed) |
 | 005 | [Caption decodes with morph](005-caption-decodes-with-morph.md) | MEDIUM | DONE |
 | 006 | [One cell size](006-one-cell-size.md) | MEDIUM | DONE |
 | 007 | [Motion tokens](007-motion-tokens.md) | LOW | DONE |

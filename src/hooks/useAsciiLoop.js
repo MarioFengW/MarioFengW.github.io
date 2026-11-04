@@ -14,6 +14,19 @@ export function measureGrid(probeHost, width, height) {
   return { ...gridSize(width, height, charWidth, lineHeight), charWidth, lineHeight };
 }
 
+export const GAS_PARALLAX = 0.4; // how fast the page-wide gas drifts against the scroll
+
+/**
+ * Where a field sits in the page-wide nebula, in rows. Every field samples the
+ * same gas at (its screen position + scroll * GAS_PARALLAX), so sections show
+ * one continuous nebula drifting slower than the page instead of separate ones.
+ */
+export function fieldOffset(wrap, lineHeight) {
+  if (!wrap || !lineHeight) return 0;
+  const top = wrap.getBoundingClientRect().top;
+  return Math.round((top + window.scrollY * GAS_PARALLAX) / lineHeight);
+}
+
 /**
  * Shared engine for full-box ASCII animations.
  *

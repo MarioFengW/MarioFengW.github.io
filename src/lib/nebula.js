@@ -123,7 +123,7 @@ export function sculpt(density, m) {
  * so each layer can be a stacked <pre> with its own colour. An optional
  * `shape(x, y)` multiplies the density, letting the same gas take a form.
  */
-export function renderNebulaLayers(cols, rows, t, pointer = null, shape = null) {
+export function renderNebulaLayers(cols, rows, t, pointer = null, shape = null, yOffset = 0) {
   const count = NEBULA_LAYERS.length;
   if (cols <= 0 || rows <= 0) return new Array(count).fill('');
   const rowsOut = Array.from({ length: count }, () => new Array(rows));
@@ -131,7 +131,9 @@ export function renderNebulaLayers(cols, rows, t, pointer = null, shape = null) 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       for (let l = 0; l < count; l++) line[l][x] = ' ';
-      const sample = nebulaSample(x, y, t, pointer);
+      // yOffset places this field in the page-wide gas, so every section shows
+      // the same nebula at its own height (one entity, not separate fields).
+      const sample = nebulaSample(x, y + yOffset, t, pointer && { x: pointer.x, y: pointer.y + yOffset });
       // `shape` sculpts the gas: a 0..~1.5 multiplier per cell (stars stay put).
       // Above ~1 it also adds gas, so a form shows even where the noise is thin.
       const cell = classifyCell(shape ? { ...sample, density: sculpt(sample.density, shape(x, y)) } : sample);

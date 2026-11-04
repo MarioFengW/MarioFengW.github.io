@@ -73,10 +73,93 @@ export function containers(cols, rows, t) {
 export const STAGE_SHAPES = [clusters, layers, containers];
 
 /** Shape for `stage`, cross-fading from `from` while `k` goes 0 -> 1. */
-export function stageShape(cols, rows, t, stage, from = stage, k = 1) {
-  const to = STAGE_SHAPES[stage](cols, rows, t);
+export function stageShape(cols, rows, t, stage, from = stage, k = 1, shapes = STAGE_SHAPES) {
+  const to = shapes[stage](cols, rows, t);
   if (from === stage || k >= 1) return to;
-  const prev = STAGE_SHAPES[from](cols, rows, t);
+  const prev = shapes[from](cols, rows, t);
   const e = k * k * (3 - 2 * k);
   return (x, y) => prev(x, y) * (1 - e) + to(x, y) * e;
 }
+
+// ---------------------------------------------------------------- experience
+// One shape per role, read from what the work did.
+
+function smooth(e0, e1, x) {
+  const k = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+  return k * k * (3 - 2 * k);
+}
+
+/** Research (MultiView stacking): three views stream in and merge into one prediction. */
+export function streams(cols, rows, t) {
+  const lanes = [0.22, 0.5, 0.78];
+  const merge = 0.62; // where the views have joined
+  const width = Math.max(1.4, rows * 0.05);
+  return (x, y) => {
+    const u = x / cols;
+    const pull = smooth(0.08, merge, u);
+    const pulse = 0.8 + 0.2 * Math.sin(x * 0.3 - t * 5); // data flowing along the lanes
+    let m = 0;
+    for (const lane of lanes) {
+      const ly = (lane + (0.5 - lane) * pull) * rows;
+      const d = y - ly;
+      m = Math.max(m, gauss(d * d, width * (u > merge ? 1.6 : 1)));
+    }
+    return 0.05 + 1.5 * m * pulse;
+  };
+}
+
+/** Data analyst (campaigns to 45,000+ contacts): rings broadcast from one source. */
+export function broadcast(cols, rows, t) {
+  const cx = cols * 0.32;
+  const cy = rows * 0.5;
+  const maxR = Math.hypot(cols, rows * 2) * 0.75;
+  const gap = maxR / 4;
+  const offset = (t * 9) % gap;
+  return (x, y) => {
+    const dx = x - cx;
+    const dy = (y - cy) * 2;
+    const r = Math.hypot(dx, dy);
+    let m = gauss(r * r, 3); // the source
+    for (let k = 0; k < 4; k++) {
+      const ring = offset + k * gap;
+      const d = r - ring;
+      m = Math.max(m, gauss(d * d, 1.6) * (1 - ring / maxR));
+    }
+    return 0.05 + 1.5 * m;
+  };
+}
+
+export const FRUIT = [
+  [0.18, 0.35], [0.4, 0.68], [0.6, 0.3], [0.82, 0.62],
+];
+
+/** Which fruit the detector is on at time t. */
+export function scanning(t) {
+  return Math.floor(t * 0.9) % FRUIT.length;
+}
+
+/** Quality control (Mask R-CNN on tomatoes): round fruit, one boxed at a time. */
+export function detection(cols, rows, t) {
+  const r = Math.min(cols, rows * 2) * 0.09;
+  const current = scanning(t);
+  const pts = FRUIT.map(([fx, fy]) => ({ x: fx * cols, y: fy * rows }));
+  return (x, y) => {
+    let m = 0.05;
+    pts.forEach((p, i) => {
+      const dx = x - p.x;
+      const dy = (y - p.y) * 2;
+      const d = Math.hypot(dx, dy);
+      const fruit = d < r ? 1.25 : gauss((d - r) * (d - r), 1) * 0.9;
+      m = Math.max(m, i === current ? fruit + 0.1 : fruit * 0.75);
+      if (i === current) {
+        const bx = Math.abs(dx) - r * 1.5;
+        const by = Math.abs(dy) - r * 1.5;
+        const onEdge = Math.max(bx, by) > -1.2 && Math.max(bx, by) < 0.6;
+        if (onEdge) m = Math.max(m, 1.45); // the bounding box
+      }
+    });
+    return m;
+  };
+}
+
+export const EXPERIENCE_SHAPES = [streams, broadcast, detection];

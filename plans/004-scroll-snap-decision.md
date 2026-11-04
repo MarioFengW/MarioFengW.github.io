@@ -1,6 +1,6 @@
 # 004 — Keep or remove page-level scroll snapping after a device test
 
-- **Status**: TODO — needs a real trackpad and phone test; snapping kept for now
+- **Status**: DONE — removed after the user felt the tug on their device
 - **Commit**: d9d3755
 - **Severity**: MEDIUM
 - **Category**: Interruptibility
