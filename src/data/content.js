@@ -34,16 +34,19 @@ export const socials = [
 
 export const expertise = [
   {
+    node: 'model',
     title: 'Machine Learning & AI',
     description: 'Applied ML research, from model design to deployment.',
     tag: 'Python · scikit-learn',
   },
   {
+    node: 'app',
     title: 'Full Stack Development',
     description: 'Web and mobile apps end-to-end, from frontend to database.',
     tag: 'React · Java · Node.js',
   },
   {
+    node: 'deploy',
     title: 'Cloud & DevOps',
     description: 'Shipped ForgeTask on OCI with Docker and automated CI/CD.',
     tag: 'Docker · Kubernetes · OCI',
@@ -93,7 +96,12 @@ export const projects = [
     context: 'Course project · Development and Deployment of Software Systems',
     description: 'AI-powered project management platform with a RAG reporting pipeline, deployed on OCI with automated CI/CD and end-to-end testing.',
     stack: ['React', 'Java', 'OCI', 'Docker'],
-    link: 'https://github.com/JRV-XVI/oci-chatbot'
+    link: 'https://github.com/JRV-XVI/oci-chatbot',
+    diagram: [
+      '[ react ] --> [ java api ] --> [ rag reports ]',
+      '                   |',
+      '            [ oci + ci/cd ]',
+    ],
   },
   {
     title: 'In & Out',
@@ -101,7 +109,12 @@ export const projects = [
     context: 'Course project · Cybersecurity & Software System',
     description: 'Digital transformation platform for Banco de Alimentos Jalisco, coordinating donors, drivers and admins with real-time state tracking and vehicle matching.',
     stack: ['React Native', 'TypeScript', 'Supabase'],
-    link: 'https://github.com/JRV-XVI/in-and-out'
+    link: 'https://github.com/JRV-XVI/in-and-out',
+    diagram: [
+      'donors  --\\',
+      'drivers ---> [ live state ] --> vehicle match',
+      'admins  --/',
+    ],
   },
   {
     title: 'Connect the Schools',
@@ -110,7 +123,11 @@ export const projects = [
     metric: '3,000+ schools',
     description: 'Educational support platform connecting 3,000+ schools with partners through similarity-based needs matching.',
     stack: ['React', 'Node.js', 'PostgreSQL'],
-    link: 'https://github.com/JRV-XVI/connect-the-schools'
+    link: 'https://github.com/JRV-XVI/connect-the-schools',
+    diagram: [
+      'schools <--> [ needs matching ] <--> partners',
+      '  3,000+         similarity',
+    ],
   },
   {
     title: 'Hack2Dawn',
@@ -118,6 +135,27 @@ export const projects = [
     context: 'PawnGuard Capture The Flag',
     description: "Built the website for PawnGuard's Capture The Flag competition, where players solve web exploitation, reverse engineering and cryptography challenges.",
     stack: ['React', 'Next.js', 'TailwindCSS', 'TypeScript'],
-    link: 'https://hack.pawnguard.org'
+    link: 'https://hack.pawnguard.org',
+    diagram: [
+      'web    --\\',
+      'rev    ---> exploit --> { flag }',
+      'crypto --/',
+    ],
   },
 ];
+// Current semester at NTU, shown in the "Now" section. Weeks run Monday to Sunday.
+export const now = {
+  place: 'NTU CSIE, Taipei',
+  semester: { label: 'fall 2026', start: '2026-09-07', weeks: 16 },
+  courses: [
+    { code: 'EE5184', title: 'Machine Learning' },
+    { code: 'AIIM', title: 'AI and Intelligent Medicine' },
+    { code: 'RPL', title: 'Robot Perception and Learning' },
+    { code: 'PP', title: 'Parallel Programming' },
+    { code: 'MSDV', title: 'Middleware for Software-Defined Vehicles' },
+  ],
+  building: [
+    'Predicting first NAFLD detection from health-checkup history',
+    'How demonstrator skill shapes MimicGen-generated robot data',
+  ],
+};

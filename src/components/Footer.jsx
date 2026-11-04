@@ -3,6 +3,17 @@ import { profile } from '../data/content';
 import ScrambleText from './ScrambleText';
 import SocialLinks from './SocialLinks';
 
+// Taipei, where this page is written from: 101 in the middle of a low skyline.
+const SKYLINE = String.raw`
+                         |
+                        /_\
+                       |___|
+                      /_____\
+        _             |_____|            __
+   __  | |   _       /_______\    _    |  |   _
+  |  | | |__| |__    |_______|   | |__ |  |__| |
+__|__|_|_|__|_|__|__/_________\__|_|__||__|__|_|__`.slice(1);
+
 export default function Footer() {
   return (
     <footer id="contact" className="contact">
@@ -17,6 +28,7 @@ export default function Footer() {
         {profile.email}
       </a>
       <SocialLinks className="contact-socials" />
+      <pre className="skyline" aria-hidden="true">{SKYLINE}</pre>
       <div className="copyright">
         <span>© {new Date().getFullYear()} {profile.name}</span>
         <span>{profile.location}</span>
