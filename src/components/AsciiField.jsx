@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from 'react';
 import { NEBULA_LAYERS, renderNebulaLayers } from '../lib/nebula';
-import useAsciiLoop from '../hooks/useAsciiLoop';
+import useAsciiLoop, { fieldOffset } from '../hooks/useAsciiLoop';
 import { frameRates } from '../lib/motion-tokens';
 
 /**
@@ -15,7 +15,8 @@ export default function AsciiField({ className = '', playing = true }) {
   const probeRef = useRef(null);
 
   const draw = useCallback((cols, rows, t, pointer) => {
-    const frames = renderNebulaLayers(cols, rows, t, pointer);
+    const lineHeight = parseFloat(window.getComputedStyle(layerRefs.current[0]).lineHeight);
+    const frames = renderNebulaLayers(cols, rows, t, pointer, null, fieldOffset(wrapRef.current, lineHeight));
     layerRefs.current.forEach((node, index) => {
       if (node) node.textContent = frames[index];
     });

@@ -326,7 +326,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 /* Scrollytelling over the whole section: the nebula is a sticky, full-bleed
    background (one screen tall, pulled out of the flow by a negative margin) and
    the steps scroll over it on the right. The gas takes its shape on the left. */
-.stages { position: relative; clip-path: inset(0 -100vw); } /* keep the sticky background inside the section vertically; full bleed sideways */
+.stages, .exp-section { position: relative; clip-path: inset(0 -100vw); } /* keep the sticky background inside the section vertically; full bleed sideways */
 .stage-bg {
   position: sticky; top: 0; z-index: 0;
   height: 100svh; margin-bottom: -100svh;
@@ -356,7 +356,6 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   min-height: 62vh; display: flex; flex-direction: column; justify-content: center; gap: 12px;
   padding: 32px 0; border-top: 1px solid var(--line);
   color: var(--ink-faint); transition: color .7s var(--ease); /* matches MORPH_S */
-  scroll-snap-align: center;
 }
 .stage-step:first-child { border-top: 0; }
 .stage-step.is-active { color: var(--ink); }
@@ -386,7 +385,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 
 /* --------------------------------------------------------- experience --- */
 /* Timeline: the rail fills with scroll; milestones light up when reached. */
-.exp-timeline { position: relative; }
+.exp-timeline { position: relative; z-index: 1; }
 .exp-rail {
   position: absolute; left: calc(1ch - 1px); top: 30px; bottom: 30px; width: 2px;
   background: var(--line);
@@ -679,11 +678,6 @@ html[data-booted] .boot { display: none; }
   to { clip-path: inset(0); opacity: 1; }
 }
 
-/* Gentle snapping: the expertise steps are the only snap points, and proximity
-   snaps only when the visitor stops close to one. */
-@media (prefers-reduced-motion: no-preference) {
-  html { scroll-snap-type: y proximity; }
-}
 
 /* ----------------------------------------------------- timeline packet --- */
 /* The experience rail speaks the same language as the wires: a packet of light
@@ -702,3 +696,15 @@ html[data-booted] .boot { display: none; }
   .exp-packet { display: none; }
   .exp-node.is-ping { animation: none; }
 }
+
+/* ------------------------------------------------- reading over the gas --- */
+/* The nebula fills each section edge to edge; the copy sits on a quiet panel of
+   the page colour so it stays readable wherever the gas gathers. */
+.stage-step, .exp-timeline {
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+}
+.stage-step { padding: 32px clamp(16px, 2.5vw, 28px); }
+.exp-timeline { padding: 8px clamp(12px, 2vw, 20px); }
+/* Wide screens: the timeline on the left, the role's shape in the gas on the right. */
+@media (min-width: 1100px) { .exp-timeline { width: min(62%, 760px); } }
+.exp-section .stage-hud { left: auto; right: max(var(--gutter), calc(50vw - var(--max) / 2 + var(--gutter))); }
