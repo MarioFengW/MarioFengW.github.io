@@ -3,6 +3,8 @@ export const profile = {
   role: 'Computer Science student & AI/ML engineer',
   summary: 'I build machine-learning models and the full-stack, cloud-deployed products around them.',
   status: 'Open to internships & research collaborations',
+  proof: 'MultiView research at 89.46% F1 · 4 shipped projects · NTU exchange, fall 2026',
+  resume: 'https://drive.google.com/file/d/1cSRtqphrJu_tVvyedutXtPUzSxCGrgvE/view?usp=sharing',
   intro: "I'm Mario, a Computer Science student at Tec de Monterrey, spending this semester on exchange at NTU. I train models, then build and deploy the products around them.",
   location: 'Guadalajara, Mexico -> Taipei, Taiwan',
   email: 'mario.fengw@gmail.com',

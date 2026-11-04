@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import ScrollMeter, { scrollProgress } from './ScrollMeter';
 import Hero from './Hero';
+import MotionToggle from './MotionToggle';
 import ThemeToggle from './ThemeToggle';
 import Experience from './Experience';
 import Projects from './Projects';
@@ -83,10 +84,10 @@ describe('ScrollMeter', () => {
   });
 });
 
-describe('Hero animation toggle', () => {
+describe('Motion toggle', () => {
   it('plays by default and can be paused and resumed', () => {
     mockReducedMotion(false);
-    render(<Hero />);
+    render(<MotionToggle />);
     const toggle = screen.getByRole('button', { name: 'Pause background animation' });
     fireEvent.click(toggle);
     expect(toggle).toHaveAccessibleName('Play background animation');
@@ -96,7 +97,7 @@ describe('Hero animation toggle', () => {
 
   it('starts paused when the OS asks for reduced motion, but can still be played', () => {
     mockReducedMotion(true);
-    render(<Hero />);
+    render(<MotionToggle />);
     fireEvent.click(screen.getByRole('button', { name: 'Play background animation' }));
     expect(screen.getByRole('button', { name: 'Pause background animation' })).toBeInTheDocument();
   });

@@ -222,12 +222,6 @@ ul, ol { list-style: none; }
 .btn:active { transform: scale(.97); }
 .hero-status { display: flex; align-items: center; gap: 10px; margin-top: 28px; color: var(--ink-dim); font-size: var(--fs-xs); }
 .status-dot { flex: none; width: 8px; height: 8px; background: var(--ok); box-shadow: 0 0 0 4px var(--ok-ring); }
-.hero-toggle {
-  position: absolute; z-index: 1; bottom: 14px; left: var(--gutter);
-  min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
-  color: var(--ink-faint); font: inherit; font-size: var(--fs-xs); letter-spacing: .04em;
-  transition: color var(--dur-ui) var(--ease);
-}
 
 /* ------------------------------------------------------------ socials --- */
 .socials { display: flex; flex-wrap: wrap; gap: 4px 14px; }
@@ -403,7 +397,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   position: relative; overflow: hidden; isolation: isolate;
   display: flex; flex-direction: column;
   padding: clamp(20px, 3vw, 32px);
-  border: 1px solid var(--line-strong); background: color-mix(in srgb, var(--bg-raised) 90%, transparent); /* the project's shape shows faintly through */
+  border: 1px solid var(--line-strong); background: var(--bg-raised);
   transform-origin: 50% 0;
 }
 .project-shade {
@@ -441,9 +435,9 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
    One line = 1.8em in both columns, so wire i lands on link i (line 2i). */
 .contact-map {
   display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 1ch;
-  margin-top: 40px; font-size: var(--fs-base); line-height: 1.8;
+  margin-top: 24px; font-size: var(--fs-sm); line-height: 1.8;
 }
-.contact-wires pre { font: var(--fs-base)/1.8 var(--mono); }
+.contact-wires pre { font: var(--fs-sm)/1.8 var(--mono); }
 .contact-routes li { height: 3.6em; }
 .contact-routes a {
   display: inline-flex; gap: 2ch; align-items: baseline; min-height: 1.8em;
@@ -451,7 +445,6 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 }
 .contact-route-label { min-width: 8ch; }
 .contact-route-handle { color: var(--ink-dim); transition: color var(--dur-ui) var(--ease); }
-.contact-routes li:first-child .contact-route-handle { color: var(--signal); }
 .copyright-journey pre { font: var(--fs-xs)/1.5 var(--mono); }
 .copyright {
   display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px;
@@ -464,8 +457,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 @media (hover: hover) and (pointer: fine) {
   .links a:hover { color: var(--ink); }
   .links a:hover .link-label { background-size: 100% 1px; }
-  .nav-toggle:hover, .theme-toggle:hover, .hero-toggle:hover { color: var(--signal); }
-  .btn:hover { border-color: var(--ink); }
+  .nav-toggle:hover, .theme-toggle:hover,   .btn:hover { border-color: var(--ink); }
   .btn-primary:hover { background: var(--signal); border-color: var(--signal); color: var(--bg); }
   .socials a:hover { color: var(--ink); }
   .socials a:hover span { color: var(--signal); }
@@ -533,7 +525,6 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 @media (max-width: 560px) {
   .page-nebula { --cell-font: 15px; --cell-line: 17px; } /* fewer cells per frame on phones */
   .contact-route-handle { display: none; }
-  .contact-routes li:first-child .contact-route-handle { display: inline; font-size: var(--fs-xs); }
   body { font-size: 14px; }
   .hero-content { padding-top: 120px; }
   .theme-toggle-label { display: none; }
@@ -664,11 +655,65 @@ html[data-booted] .boot { display: none; }
 main { position: relative; z-index: 1; }
 .stage-pipeline { margin: -24px 0 32px; }
 .stage-pipeline pre { color: var(--ink-faint); }
+@media (max-width: 560px) { .nebula-hud { display: none; } }
 .nebula-hud {
   position: absolute; left: var(--gutter); bottom: 16px; margin: 0;
   padding: 6px 10px; background: var(--bg); color: var(--ink-dim); font-size: var(--fs-xs);
 }
 /* Copy that sits on open gas gets the same quiet panel as the steps. */
-.about-copy, .contact-map, .contact-copy { background: color-mix(in srgb, var(--bg) 84%, transparent); padding: 16px clamp(12px, 2vw, 20px); }
-.contact-map, .contact-copy { width: fit-content; max-width: 100%; }
+.about-copy, .contact-map, .contact-copy, .composer, .contact-direct { background: color-mix(in srgb, var(--bg) 84%, transparent); padding: 16px clamp(12px, 2vw, 20px); }
+.contact-map { width: fit-content; max-width: 100%; }
 .hero-content > * { position: relative; }
+
+/* ------------------------------------------------------------ polish --- */
+.stage-step:first-child { min-height: 0; padding-top: 8px; }
+.hero-proof { margin-top: 10px; color: var(--ink-dim); font-size: var(--fs-sm); }
+.btn-quiet { border-color: transparent; color: var(--ink-dim); }
+.motion-toggle, .contact-copy-btn { background: none; border: 0; padding: 0; cursor: pointer; }
+.motion-toggle {
+  display: inline-flex; gap: .6ch; align-items: center; white-space: nowrap;
+  font: inherit; font-size: var(--fs-xs); color: var(--ink-dim);
+  transition: color var(--dur-ui) var(--ease), transform var(--dur-press) var(--ease);
+}
+.motion-toggle:active { transform: scale(.97); }
+@media (hover: hover) and (pointer: fine) { .motion-toggle:hover, .btn-quiet:hover { color: var(--signal); } }
+@media (max-width: 560px) { .motion-toggle-label { display: none; } }
+
+/* Contact composer: a terminal session that writes the email with you. */
+.composer {
+  display: grid; gap: 14px; max-width: 640px; margin-top: 32px;
+  font-size: var(--fs-sm);
+}
+.composer-cmd { margin: 0; color: var(--ink); }
+.composer-prompt { color: var(--accent); }
+.composer-row { display: grid; grid-template-columns: 9ch minmax(0, 1fr); gap: 12px; align-items: baseline; border: 0; padding: 0; margin: 0; }
+.composer-row-message { align-items: start; }
+.composer-key { color: var(--accent); padding: 0; float: left; }
+.composer input[type='text'], .composer textarea {
+  width: 100%; padding: 6px 10px; border: 1px solid var(--line-strong);
+  background: var(--bg); color: var(--ink); font: inherit; resize: vertical;
+  transition: border-color var(--dur-ui) var(--ease);
+}
+.composer input[type='text']:focus-visible, .composer textarea:focus-visible { border-color: var(--signal); outline: none; }
+.composer ::placeholder { color: var(--ink-faint); }
+.composer-topics { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.composer-topic { position: relative; cursor: pointer; color: var(--ink-dim); white-space: nowrap; transition: color var(--dur-ui) var(--ease); }
+.composer-topic input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.composer-topic.is-on { color: var(--ink); }
+.composer-topic.is-on span { color: var(--signal); }
+.composer-topic:has(input:focus-visible) { outline: 2px solid var(--signal); outline-offset: 3px; }
+.composer-actions { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; padding-left: calc(9ch + 12px); }
+.composer-note { color: var(--ink-faint); font-size: var(--fs-xs); }
+.contact-direct {
+  display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: baseline;
+  width: fit-content; max-width: 100%; margin-top: 18px; font-size: var(--fs-sm);
+}
+.contact-email { color: var(--signal); word-break: break-all; }
+.contact-copy-btn { font: inherit; color: var(--ink-dim); transition: color var(--dur-ui) var(--ease), transform var(--dur-press) var(--ease); }
+.contact-copy-btn:active { transform: scale(.97); }
+.contact-time { color: var(--ink-faint); font-size: var(--fs-xs); font-variant-numeric: tabular-nums; }
+@media (hover: hover) and (pointer: fine) { .contact-copy-btn:hover, .contact-email:hover { color: var(--ink); } }
+@media (max-width: 560px) {
+  .composer-row { grid-template-columns: 1fr; gap: 4px; }
+  .composer-actions { padding-left: 0; }
+}
