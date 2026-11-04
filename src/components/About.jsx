@@ -25,7 +25,7 @@ export default function About({ fetchImpl }) {
       <div className="about-inner">
         <SectionHeading title="Hello, world" />
         <div className="about-grid">
-          <div className="about-copy">
+          <div className="about-copy" data-clearing="">
             <p className="about-intro">{profile.intro}</p>
             <dl className="facts">
               {facts.map((fact) => (

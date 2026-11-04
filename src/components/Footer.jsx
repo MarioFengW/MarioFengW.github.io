@@ -80,12 +80,12 @@ export default function Footer() {
     <footer id="contact" className="contact">
       {/* Headline font (Pixelta) has no apostrophe glyph, so keep display copy apostrophe-free. */}
       <ScrambleText as="h2" text="Get in touch" />
-      <p className="contact-copy">
+      <p className="contact-copy" data-clearing="">
         Open to internships, research collaborations and freelance work in AI/ML, full-stack development and DevOps.
       </p>
 
       <div className="contact-body">
-        <div className="contact-side">
+        <div className="contact-side" data-clearing="">
           <div className="contact-map">
             <AsciiFlow className="contact-wires" lines={ROUTES} bursts={bursts} />
             <ul className="contact-routes">
@@ -116,7 +116,7 @@ export default function Footer() {
             )}
           </div>
         </div>
-        <form className="composer" onSubmit={(event) => event.preventDefault()} aria-label="Write me an email">
+        <form data-clearing="" className="composer" onSubmit={(event) => event.preventDefault()} aria-label="Write me an email">
           <p className="composer-cmd" aria-hidden="true">
             <span className="composer-prompt">$ </span>mail mario
           </p>

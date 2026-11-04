@@ -242,28 +242,6 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   text-transform: uppercase;
   text-wrap: balance;
 }
-.ascii-rule {
-  display: block; margin-top: 22px; overflow: hidden; white-space: nowrap;
-  color: var(--line-strong); font-size: var(--fs-xs); line-height: 1;
-}
-.ascii-rule::before { content: '+------------------------------------------------------------------------------------------------------------------------------------------------------------------------'; }
-
-/* --------------------------------------------------- section divider --- */
-/* Full-bleed, scroll-linked ASCII band between sections. */
-.section-divider {
-  position: relative; height: 105px; overflow: hidden;
-  margin-left: calc(50% - 50vw); width: 100vw;
-  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
-}
-.section-divider-pre {
-  margin: 0; color: var(--accent); opacity: .55;
-  font: 400 var(--cell-font)/var(--cell-line) var(--mono); white-space: pre; user-select: none;
-}
-.section-divider-label {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  padding: 4px 12px; background: var(--bg); border: 1px solid var(--line-strong);
-  color: var(--signal); font-size: var(--fs-xs); letter-spacing: .06em; white-space: nowrap;
-}
 
 /* -------------------------------------------------------------- about --- */
 .about { position: relative; isolation: isolate; }
@@ -306,14 +284,11 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 
 .stage-step {
   min-height: calc(62vh / var(--zoom)); display: flex; flex-direction: column; justify-content: center; gap: 12px;
-  padding: 32px 0; border-top: 1px solid var(--line);
+  padding: 32px 0;
   color: var(--ink-faint); transition: color .7s var(--ease); /* matches MORPH_S */
 }
-.stage-step:first-child { border-top: 0; }
 .stage-step.is-active { color: var(--ink); }
-.stage-step-node { font-size: var(--fs-xs); transition: color .7s var(--ease); /* matches MORPH_S */ }
-.stage-step.is-active .stage-step-node { color: var(--accent); }
-.stage-step-title { font: 400 clamp(1.8rem, 3.4vw, 2.8rem)/1.05 var(--display); text-transform: uppercase; }
+.stage-step-title { font: 400 clamp(2.2rem, 4.6vw, 4rem)/1 var(--display); text-transform: uppercase; }
 .stage-step-desc { max-width: 46ch; font-size: var(--fs-base); }
 .stage-step-evidence { display: grid; gap: 6px; font-size: var(--fs-sm); }
 .stage-step.is-active .stage-step-evidence span { color: var(--accent); }
@@ -346,8 +321,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   display: block; width: 100%; height: 100%;
   background: var(--accent); transform: scaleY(0); transform-origin: top;
 }
-.exp-item { border-top: 1px solid var(--line); }
-.exp-item:last-child { border-bottom: 1px solid var(--line); }
+.exp-item { }
 .exp-heading { font: inherit; }
 .exp-header {
   display: grid; grid-template-columns: 2ch minmax(0, 1fr) auto auto 3ch; gap: 16px; align-items: center;
@@ -398,7 +372,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   position: relative; overflow: hidden; isolation: isolate;
   display: flex; flex-direction: column;
   padding: clamp(20px, 3vw, 32px);
-  border: 1px solid var(--line-strong); background: var(--bg-raised);
+  background: var(--bg-raised); /* a tone step, no outline */
   transform-origin: 50% 0;
 }
 .project-shade {
@@ -449,7 +423,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .copyright-journey pre { font: var(--fs-xs)/1.5 var(--mono); }
 .copyright {
   display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px;
-  margin-top: 72px; padding-top: 18px; border-top: 1px solid var(--line);
+  margin-top: 96px;
   color: var(--ink-faint); font-size: var(--fs-xs);
 }
 
@@ -639,11 +613,6 @@ html[data-booted] .boot { display: none; }
 /* ------------------------------------------------- reading over the gas --- */
 /* The nebula fills each section edge to edge; the copy sits on a quiet panel of
    the page colour so it stays readable wherever the gas gathers. */
-.stage-step, .exp-timeline {
-  background: color-mix(in srgb, var(--bg) 84%, transparent);
-}
-.stage-step { padding: 32px clamp(16px, 2.5vw, 28px); }
-.exp-timeline { padding: 8px clamp(12px, 2vw, 20px); }
 /* Wide screens: the timeline on the left, the role's shape in the gas on the right. */
 @media (min-width: 1100px) { .exp-timeline { width: min(62%, 760px); } }
 
@@ -662,7 +631,6 @@ main { position: relative; z-index: 1; }
   padding: 6px 10px; background: var(--bg); color: var(--ink-dim); font-size: var(--fs-xs);
 }
 /* Copy that sits on open gas gets the same quiet panel as the steps. */
-.about-copy, .contact-map, .contact-copy, .composer, .contact-direct { background: color-mix(in srgb, var(--bg) 84%, transparent); padding: 16px clamp(12px, 2vw, 20px); }
 .contact-map { width: fit-content; max-width: 100%; }
 .hero-content > * { position: relative; }
 
@@ -743,3 +711,11 @@ main { position: relative; z-index: 1; }
   .contact-body { grid-template-columns: 1fr; }
   .contact-body .composer { order: -1; } /* on phones, writing comes first */
 }
+
+/* ------------------------------------------------------- clearings --- */
+/* Content sits in clearings the nebula opens around it (see lib/clearings.js),
+   not on panels: no boxes, no outlines, no rules. Separation is space and tone. */
+.exp-item + .exp-item { margin-top: 6px; }
+.weather-status { border: 0; background: var(--bg-raised); }
+.project-context { margin-top: 10px; }
+.section-head { margin-bottom: 40px; }

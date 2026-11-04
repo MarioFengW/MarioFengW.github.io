@@ -67,7 +67,7 @@ export default function Experience() {
   return (
     <section id="experience" className="exp-section">
       <SectionHeading title="Experience" />
-      <div className="exp-timeline" ref={timelineRef}>
+      <div className="exp-timeline" ref={timelineRef} data-clearing="">
         <span className="exp-rail" aria-hidden="true">
           <span className="exp-progress" ref={progressRef} />
           <span className="exp-packet" ref={packetRef}>*</span>
