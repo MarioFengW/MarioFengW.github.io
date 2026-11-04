@@ -7,7 +7,7 @@ export default function WeatherStatus({ city, weather, status, localTime }) {
   if (status === 'error') reading = 'weather offline';
 
   return (
-    <aside className="weather-status" data-status={status} aria-label={`Weather in ${city.name}`}>
+    <aside data-clearing="" className="weather-status" data-status={status} aria-label={`Weather in ${city.name}`}>
       <p className="weather-status-head">$ weather --city {city.name.toLowerCase()}</p>
       <p className="weather-status-temp" aria-hidden={status !== 'ready'}>
         {status === 'ready' ? weather.temperature : '--'}

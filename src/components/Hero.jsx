@@ -15,7 +15,7 @@ export default function Hero() {
 
   return (
     <section className="hero" id="top">
-      <div className="hero-content">
+      <div className="hero-content" data-clearing="">
         <h1>
           {first}
           <br />

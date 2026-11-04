@@ -59,8 +59,8 @@ export default function Expertise() {
             className={`stage-step${index === active ? ' is-active' : ''}`}
             key={item.title}
             data-index={index}
+            data-clearing=""
           >
-            <span className="stage-step-node" aria-hidden="true">[ {item.node} ]</span>
             <h3 className="stage-step-title">{item.title}</h3>
             <p className="stage-step-desc">{item.description}</p>
             <ul className="stage-step-evidence">

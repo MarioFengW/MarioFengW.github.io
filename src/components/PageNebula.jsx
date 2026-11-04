@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { getFocus, isPaused, registeredSections, setActiveSection, subscribe } from '../lib/nebulaFocus';
 import { blendShapes } from '../lib/stages';
+import { clearingMask, toCells, withClearings } from '../lib/clearings';
 import { frameRates } from '../lib/motion-tokens';
 import useReducedMotion from '../hooks/useReducedMotion';
 import AsciiField from './AsciiField';
@@ -81,7 +82,11 @@ export default function PageNebula() {
       const morph = morphRef.current;
       if (morph.start === null) morph.start = t;
       const k = playing ? Math.min(1, (t - morph.start) / MORPH_S) : 1;
-      return blendShapes(morph.from, morph.to, cols, rows, t, k);
+      const shape = blendShapes(morph.from, morph.to, cols, rows, t, k);
+      // The gas opens around the content on screen (the field covers the viewport).
+      const rects = [...document.querySelectorAll('[data-clearing]')].map((node) => node.getBoundingClientRect());
+      const cells = toCells(rects, window.innerWidth / cols, window.innerHeight / rows, cols, rows);
+      return withClearings(shape, clearingMask(cells));
     },
     [playing]
   );

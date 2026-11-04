@@ -2,7 +2,6 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import BootScreen, { BOOT_LINES, BOOT_LOG_MS, bootLog } from './BootScreen';
-import SectionDivider, { dividerFrame, dividerProgress } from './SectionDivider';
 import About from './About';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -131,71 +130,6 @@ describe('BootScreen', () => {
   });
 });
 
-describe('SectionDivider', () => {
-  it('progress runs 0 -> 1 as the band crosses the viewport', () => {
-    expect(dividerProgress(1000, 100, 900)).toBe(0); // below the fold
-    expect(dividerProgress(400, 100, 900)).toBe(0.5);
-    expect(dividerProgress(-100, 100, 900)).toBe(1); // scrolled past
-  });
-
-  it('glyphs sweep in during the first half and out during the second, never solid', () => {
-    const filled = (s) => s.replace(/\s/g, '').length;
-    expect(filled(dividerFrame(40, 4, 0))).toBe(0);
-    expect(filled(dividerFrame(40, 4, 0.5))).toBe(160); // fully covered at the midpoint
-    expect(dividerFrame(40, 4, 0.5)).not.toMatch(/[@#%]/); // light ramp only
-    expect(new Set(dividerFrame(40, 4, 0.5).replace(/\s/g, '')).size).toBeGreaterThan(2); // textured, not a bar
-    expect(filled(dividerFrame(40, 4, 1))).toBe(0);
-    expect(filled(dividerFrame(40, 4, 0.25))).toBeLessThan(160);
-    expect(dividerFrame(0, 4, 0.5)).toBe('');
-  });
-
-  it('follows scroll only while on screen and cleans up', () => {
-    mockLayout();
-    mockReducedMotion(false);
-    const io = mockIntersectionObserver();
-    const raf = mockAnimationFrame();
-    vi.stubGlobal('innerHeight', 900);
-    const { container, unmount } = render(<SectionDivider label=">> 02 expertise" />);
-    const pre = container.querySelector('.section-divider-pre');
-    expect(container.querySelector('.section-divider')).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.getByText('>> 02 expertise')).toBeInTheDocument();
-    raf.step(0); // initial measure
-
-    io.trigger(true);
-    window.dispatchEvent(new Event('scroll'));
-    raf.step(16);
-    expect(pre.textContent.split('\n')).toHaveLength(4);
-
-    io.trigger(false);
-    pre.textContent = 'stale';
-    window.dispatchEvent(new Event('scroll'));
-    raf.step(32);
-    expect(pre.textContent).toBe('stale'); // not listening offscreen
-
-    window.dispatchEvent(new Event('resize'));
-    unmount();
-    expect(raf.pending()).toBe(0);
-  });
-
-  it('works without IntersectionObserver and stays empty with reduced motion', () => {
-    mockLayout();
-    mockReducedMotion(false);
-    const original = window.IntersectionObserver;
-    delete window.IntersectionObserver;
-    try {
-      const raf = mockAnimationFrame();
-      const { container } = render(<SectionDivider label="x" />);
-      raf.step(0);
-      expect(container.querySelector('pre').textContent.length).toBeGreaterThan(0);
-    } finally {
-      window.IntersectionObserver = original;
-    }
-    mockReducedMotion(true);
-    const { container } = render(<SectionDivider label="y" />);
-    expect(container.querySelector('pre').textContent).toBe('');
-  });
-});
-
 describe('About with live weather', () => {
   beforeEach(mockLayout);
 
@@ -260,7 +194,6 @@ describe('SectionHeading', () => {
     const { container } = render(<SectionHeading title="What I work on" />);
     expect(screen.getByRole('heading', { level: 2, name: 'What I work on' })).toBeVisible();
     expect(container.querySelector('.kicker')).toBeNull();
-    expect(container.querySelector('.ascii-rule')).toHaveAttribute('aria-hidden', 'true');
     expect(container.querySelector('[style*="clip-path"]')).toBeNull();
   });
 });

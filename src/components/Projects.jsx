@@ -99,8 +99,8 @@ export default function Projects() {
                 </header>
                 <div className="project-body">
                   <div className="project-main">
-                    <p className="project-context">{project.context}</p>
                     <h3 className="project-title" id={`project-${slug}`}>{project.title}</h3>
+                    <p className="project-context">{project.context}</p>
                     {project.metric && <p className="project-metric">{project.metric}</p>}
                     {project.diagram && <AsciiFlow lines={project.diagram} fast={hovered === project.title} />}
                   </div>

@@ -8,7 +8,6 @@ import Projects from '../components/Projects';
 import Footer from '../components/Footer';
 import PageTransition from '../components/PageTransition';
 import BootScreen from '../components/BootScreen';
-import SectionDivider from '../components/SectionDivider';
 import PageNebula from '../components/PageNebula';
 
 export default function HomePage() {
@@ -25,9 +24,7 @@ export default function HomePage() {
           <About />
           <Expertise />
           <Experience />
-          <SectionDivider label=">> projects" />
           <Projects />
-          <SectionDivider label=">> contact" />
           <Footer />
         </div>
       </main>
