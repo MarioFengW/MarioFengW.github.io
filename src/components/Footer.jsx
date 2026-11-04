@@ -2,10 +2,13 @@ import React, { useRef, useState } from 'react';
 import { profile, socials } from '../data/content';
 import { routeLines, routePath } from '../lib/routes';
 import useReducedMotion from '../hooks/useReducedMotion';
+import useNebulaFocus from '../hooks/useNebulaFocus';
+import { broadcast } from '../lib/stages';
 import AsciiFlow from './AsciiFlow';
 import ScrambleText from './ScrambleText';
 
 const ROUTES = routeLines(socials.length);
+const CONTACT_FOCUS = { key: 'contact', shape: broadcast, label: '[ you ] say hi' };
 const JOURNEY = ['Guadalajara, MX --------> Taipei, TW'];
 
 function linkProps(href) {
@@ -22,6 +25,7 @@ function finePointer() {
 
 export default function Footer() {
   const reducedMotion = useReducedMotion();
+  useNebulaFocus('contact', CONTACT_FOCUS);
   const [bursts, setBursts] = useState([]);
   const nextId = useRef(0);
 

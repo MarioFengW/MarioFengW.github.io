@@ -1,10 +1,9 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { expertise } from '../data/content';
-import useReducedMotion from '../hooks/useReducedMotion';
 import useScrollLinked from '../hooks/useScrollLinked';
 import AsciiFlow from './AsciiFlow';
-import NebulaStage from './NebulaStage';
-import ScrambleText from './ScrambleText';
+import useNebulaFocus from '../hooks/useNebulaFocus';
+import { STAGE_SHAPES } from '../lib/stages';
 import SectionHeading from './SectionHeading';
 
 const PIPELINE_LINE = ['data', ...expertise.map((item) => item.node)].map((node) => `[ ${node} ]`).join(' ----> ');
@@ -17,7 +16,6 @@ const PIPELINE_LINE = ['data', ...expertise.map((item) => item.node)].map((node)
  */
 export default function Expertise() {
   const [active, setActive] = useState(0);
-  const reducedMotion = useReducedMotion();
   const listRef = useRef(null);
 
   const activeRef = useRef(0);
@@ -45,20 +43,16 @@ export default function Expertise() {
   useScrollLinked(listRef, update);
 
   const current = expertise[active];
+  useNebulaFocus('expertise', {
+    key: `expertise-${active}`,
+    shape: STAGE_SHAPES[active],
+    label: `[ ${current.node} ] ${current.shape}`,
+  });
 
   return (
     <section id="expertise" className="stages">
       <SectionHeading title="What I work on" />
-      <div className="stage-bg" aria-hidden="true">
-        <NebulaStage stage={active} playing={!reducedMotion} />
-        <div className="stage-hud">
-          <p className="stage-caption">
-            {/* Decodes while the gas re-forms (same 0.7 s), replayed on each step. */}
-            <ScrambleText key={active} text={`[ ${current.node} ] ${current.shape}`} immediate />
-          </p>
-          <AsciiFlow className="stage-pipeline" lines={[PIPELINE_LINE]} />
-        </div>
-      </div>
+      <AsciiFlow className="stage-pipeline" lines={[PIPELINE_LINE]} />
       <ol className="stage-steps" ref={listRef}>
         {expertise.map((item, index) => (
           <li

@@ -17,7 +17,7 @@ const RAIN = [51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82];
 const FOG = [45, 48];
 const CLOUD = [2, 3];
 
-/** Map an Open-Meteo WMO weather code to one of the weather scene types (see weatherField.js). */
+/** Map an Open-Meteo WMO weather code to one of the weather types (drawn as gas by weatherGas in stages.js). */
 export function mapWeatherCode(code, windSpeedKmh = 0, isDay = 1) {
   if (windSpeedKmh >= 40) return 'wind';
   if (THUNDER.includes(code)) return 'thunder';

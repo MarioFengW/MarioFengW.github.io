@@ -5,6 +5,7 @@ import Experience from './Experience';
 import { broadcast, detection, EXPERIENCE_SHAPES, FRUIT, scanning, streams } from '../lib/stages';
 import { fieldOffset, GAS_PARALLAX } from '../hooks/useAsciiLoop';
 import { mockIntersectionObserver, mockReducedMotion } from '../test/browser';
+import { getFocus, resetFocus, setActiveSection } from '../lib/nebulaFocus';
 
 describe('experience shapes', () => {
   it('streams are three lanes on the left and one merged lane on the right', () => {
@@ -48,8 +49,10 @@ describe('Experience nebula focus', () => {
     mockReducedMotion(true);
     mockIntersectionObserver();
     vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    resetFocus();
     const { container } = render(<Experience />);
-    const caption = () => container.querySelector('.stage-caption').textContent;
+    setActiveSection('experience');
+    const caption = () => getFocus().label;
     expect(caption()).toContain('itesm');
     const items = container.querySelectorAll('.exp-item');
     act(() => {

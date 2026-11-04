@@ -2,10 +2,8 @@ import React, { useCallback, useRef, useState } from 'react';
 import { experience } from '../data/content';
 import { timelineProgress } from '../lib/scrollMath';
 import useScrollLinked from '../hooks/useScrollLinked';
-import useReducedMotion from '../hooks/useReducedMotion';
 import { EXPERIENCE_SHAPES } from '../lib/stages';
-import NebulaStage from './NebulaStage';
-import ScrambleText from './ScrambleText';
+import useNebulaFocus from '../hooks/useNebulaFocus';
 import SectionHeading from './SectionHeading';
 
 /**
@@ -23,8 +21,12 @@ function finePointer() {
 export default function Experience() {
   const [openIndex, setOpenIndex] = useState(0);
   const [hoverIndex, setHoverIndex] = useState(null);
-  const reducedMotion = useReducedMotion();
   const focus = hoverIndex ?? (openIndex >= 0 ? openIndex : 0);
+  useNebulaFocus('experience', {
+    key: `experience-${focus}`,
+    shape: EXPERIENCE_SHAPES[focus],
+    label: `[ ${experience[focus].organization.toLowerCase()} ] ${experience[focus].shape}`,
+  });
   const timelineRef = useRef(null);
   const progressRef = useRef(null);
   const packetRef = useRef(null);
@@ -65,14 +67,6 @@ export default function Experience() {
   return (
     <section id="experience" className="exp-section">
       <SectionHeading title="Experience" />
-      <div className="stage-bg" aria-hidden="true">
-        <NebulaStage stage={focus} shapes={EXPERIENCE_SHAPES} side="right" playing={!reducedMotion} />
-        <div className="stage-hud">
-          <p className="stage-caption">
-            <ScrambleText key={focus} text={`[ ${experience[focus].organization.toLowerCase()} ] ${experience[focus].shape}`} immediate />
-          </p>
-        </div>
-      </div>
       <div className="exp-timeline" ref={timelineRef}>
         <span className="exp-rail" aria-hidden="true">
           <span className="exp-progress" ref={progressRef} />
