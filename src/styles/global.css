@@ -314,27 +314,31 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .weather-status-note { margin-top: 12px; color: var(--ink-faint); font-size: var(--fs-xs); }
 
 /* ---------------------------------------------------------- expertise --- */
-/* Scrollytelling: a sticky nebula stage beside three steps. The gas re-forms
-   into each area's shape as its step crosses the middle of the screen. */
-.stage-grid {
-  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-  gap: clamp(32px, 6vw, 80px); align-items: start;
-}
-.stage-view { position: sticky; top: calc(var(--nav-h) + 32px); display: grid; gap: 14px; }
-.stage-frame {
-  position: relative; height: min(62vh, 520px);
-  border: 1px solid var(--line); background: var(--bg-raised); overflow: hidden;
+/* Scrollytelling over the whole section: the nebula is a sticky, full-bleed
+   background (one screen tall, pulled out of the flow by a negative margin) and
+   the steps scroll over it on the right. The gas takes its shape on the left. */
+.stages { position: relative; }
+.stage-bg {
+  position: sticky; top: 0; z-index: 0;
+  height: 100svh; margin-bottom: -100svh;
+  width: 100vw; margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
 }
 .nebula-stage .ascii-field-pre { font-size: 12px; line-height: 14px; }
-.stage-caption { position: absolute; left: 10px; bottom: 10px; margin: 0; padding: 4px 8px; background: var(--bg-raised); color: var(--ink-dim); font-size: var(--fs-xs); }
-.stage-caption-node { color: var(--accent); }
-.stage-wire {
-  margin: 0; color: var(--ink-faint); font-size: var(--fs-xs); white-space: nowrap; overflow-x: auto;
-  font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0;
+.stage-hud {
+  position: absolute; bottom: 16%; left: max(var(--gutter), calc(50vw - var(--max) / 2 + var(--gutter)));
+  display: grid; gap: 8px;
 }
-.stage-wire span { transition: color .25s var(--ease); }
-.stage-wire .is-active { color: var(--accent); }
-.stage-steps { display: grid; }
+.stage-caption { margin: 0; color: var(--ink-dim); font-size: var(--fs-xs); }
+.stage-caption-node { color: var(--accent); }
+.stage-pipeline pre { color: var(--ink-faint); }
+.stage-steps {
+  position: relative; z-index: 1;
+  width: min(46%, 520px); margin-left: auto;
+}
+
 .stage-step {
   min-height: 62vh; display: flex; flex-direction: column; justify-content: center; gap: 12px;
   padding: 32px 0; border-top: 1px solid var(--line);
@@ -355,7 +359,8 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 /* -------------------------------------------------- project diagrams --- */
 /* Architecture drawings whose wires carry packets of nebula light. Drawn cell
    by cell: ligatures off, or "-->" would collapse into one glyph. */
-.ascii-flow { position: relative; margin-top: 22px; overflow-x: auto; }
+.ascii-flow { position: relative; overflow-x: auto; }
+.project-main .ascii-flow { margin-top: 22px; }
 .ascii-flow pre {
   margin: 0; font: var(--fs-xs)/1.5 var(--mono); white-space: pre;
   font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0;
@@ -365,15 +370,6 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .ascii-flow-trail { color: var(--neb-rose); }
 .ascii-flow-head { color: var(--neb-core); text-shadow: 0 0 6px var(--neb-glow); }
 
-/* ------------------------------------------------------- nebula outro --- */
-/* The hero's nebula returns at the end of the page, rising behind the contact. */
-.contact { position: relative; isolation: isolate; overflow: clip; }
-.contact > :not(.contact-field) { position: relative; z-index: 1; }
-.contact-field {
-  z-index: 0; left: calc(50% - 50vw); right: auto; width: 100vw;
-  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, .9) 0%, rgba(0, 0, 0, .35) 45%, transparent 85%);
-  mask-image: linear-gradient(to top, rgba(0, 0, 0, .9) 0%, rgba(0, 0, 0, .35) 45%, transparent 85%);
-}
 
 /* --------------------------------------------------------- experience --- */
 /* Timeline: the rail fills with scroll; milestones light up when reached. */
@@ -472,14 +468,22 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 /* ------------------------------------------------------------ contact --- */
 .contact { border-bottom: 0; }
 .contact-copy { max-width: 58ch; margin-top: 24px; color: var(--ink-dim); }
-.contact-email {
-  display: inline-block; margin-top: 28px; padding-bottom: 4px;
-  font-size: clamp(1.05rem, 3.2vw, 1.6rem); font-weight: 500;
-  border-bottom: 1px solid var(--signal); word-break: break-all;
-  transition: color .18s var(--ease);
+/* Wiring diagram: wires on the left, each ending at its link on the same line.
+   One line = 1.8em in both columns, so wire i lands on link i (line 2i). */
+.contact-map {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 1ch;
+  margin-top: 40px; font-size: var(--fs-base); line-height: 1.8;
 }
-.contact-email span { color: var(--signal); }
-.contact-socials { margin-top: 24px; }
+.contact-wires pre { font: var(--fs-base)/1.8 var(--mono); }
+.contact-routes li { height: 3.6em; }
+.contact-routes a {
+  display: inline-flex; gap: 2ch; align-items: baseline; min-height: 1.8em;
+  color: var(--ink); transition: color .18s var(--ease);
+}
+.contact-route-label { min-width: 8ch; }
+.contact-route-handle { color: var(--ink-dim); transition: color .18s var(--ease); }
+.contact-routes li:first-child .contact-route-handle { color: var(--signal); }
+.copyright-journey pre { font: var(--fs-xs)/1.5 var(--mono); }
 .copyright {
   display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px;
   margin-top: 72px; padding-top: 18px; border-top: 1px solid var(--line);
@@ -499,7 +503,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   .exp-header:hover .exp-title { color: var(--accent); }
   .exp-meta a:hover { color: var(--ink); text-decoration: underline; }
   .project-cta:hover { background: var(--ink); color: var(--bg); }
-  .contact-email:hover { color: var(--signal); }
+  .contact-routes a:hover, .contact-routes a:hover .contact-route-handle { color: var(--signal); }
 }
 
 /* --------------------------------------------------- page transition --- */
@@ -531,10 +535,10 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 /* --------------------------------------------------------- responsive --- */
 @media (max-width: 1080px) { .scroll-meter { display: none; } .theme-toggle { margin-left: auto; } }
 @media (max-width: 860px) {
-  .stage-grid { grid-template-columns: 1fr; gap: 0; }
-  .stage-view { top: calc(var(--nav-h) + 8px); z-index: 2; background: var(--bg); padding-bottom: 8px; }
-  .stage-frame { height: 34vh; }
-  .stage-step { min-height: 54vh; }
+  .stage-steps { width: 100%; }
+  .stage-step { min-height: 70svh; }
+  .nebula-stage { opacity: .3; }
+  .stage-hud { bottom: 10%; }
   .nav-toggle { display: block; }
   /* Menu drops in (opacity + small translate), items follow with a 40ms stagger.
      visibility keeps closed links out of the tab order without display:none. */
@@ -560,6 +564,8 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   .project-body { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
+  .contact-route-handle { display: none; }
+  .contact-routes li:first-child .contact-route-handle { display: inline; font-size: var(--fs-xs); }
   body { font-size: 14px; }
   .hero-field {
     /* The nebula is vivid: keep it strong above the copy, faint behind it. */
@@ -644,7 +650,7 @@ html[data-booted] .boot { display: none; }
    timelines (or with reduced motion) they are simply visible. */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .ascii-flow, .stage-frame {
+    .project-main .ascii-flow {
       animation-name: scan-in;
       animation-duration: auto;
       animation-timing-function: linear;

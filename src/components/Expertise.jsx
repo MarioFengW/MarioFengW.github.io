@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expertise } from '../data/content';
 import useReducedMotion from '../hooks/useReducedMotion';
+import AsciiFlow from './AsciiFlow';
 import NebulaStage from './NebulaStage';
 import SectionHeading from './SectionHeading';
 
-const PIPELINE = ['data', ...expertise.map((item) => item.node)];
+const PIPELINE_LINE = ['data', ...expertise.map((item) => item.node)].map((node) => `[ ${node} ]`).join(' ----> ');
 
 /**
- * Scrollytelling: a sticky nebula stage on one side, three steps on the other.
- * As each step reaches the middle of the screen it becomes active and the gas
- * re-forms into that area's shape (clusters, layers, containers).
+ * Scrollytelling over the whole section: the nebula fills a sticky, full-bleed
+ * background while three steps scroll over it. As each step reaches the middle
+ * of the screen the gas re-forms into that area's shape (clusters, layers,
+ * containers) on the side of the screen the text leaves free.
  */
 export default function Expertise() {
   const [active, setActive] = useState(0);
@@ -46,46 +48,37 @@ export default function Expertise() {
   return (
     <section id="expertise" className="stages">
       <SectionHeading title="What I work on" />
-      <div className="stage-grid">
-        <div className="stage-view">
-          <div className="stage-frame">
-            <NebulaStage stage={active} playing={!reducedMotion} />
-            <p className="stage-caption" aria-hidden="true">
-              <span className="stage-caption-node">[ {current.node} ]</span> {current.shape}
-            </p>
-          </div>
-          <p className="stage-wire" aria-hidden="true">
-            {PIPELINE.map((node, index) => (
-              <React.Fragment key={node}>
-                {index > 0 && <span className="stage-wire-link"> --&gt; </span>}
-                <span className={index - 1 === active ? 'is-active' : undefined}>[ {node} ]</span>
-              </React.Fragment>
-            ))}
+      <div className="stage-bg" aria-hidden="true">
+        <NebulaStage stage={active} playing={!reducedMotion} />
+        <div className="stage-hud">
+          <p className="stage-caption">
+            <span className="stage-caption-node">[ {current.node} ]</span> {current.shape}
           </p>
+          <AsciiFlow className="stage-pipeline" lines={[PIPELINE_LINE]} />
         </div>
-        <ol className="stage-steps" ref={listRef}>
-          {expertise.map((item, index) => (
-            <li
-              className={`stage-step${index === active ? ' is-active' : ''}`}
-              key={item.title}
-              data-index={index}
-            >
-              <span className="stage-step-node" aria-hidden="true">[ {item.node} ]</span>
-              <h3 className="stage-step-title">{item.title}</h3>
-              <p className="stage-step-desc">{item.description}</p>
-              <ul className="stage-step-evidence">
-                {item.evidence.map((line) => (
-                  <li key={line}>
-                    <span aria-hidden="true">&gt; </span>
-                    {line}
-                  </li>
-                ))}
-              </ul>
-              <p className="stage-step-stack">{item.tag}</p>
-            </li>
-          ))}
-        </ol>
       </div>
+      <ol className="stage-steps" ref={listRef}>
+        {expertise.map((item, index) => (
+          <li
+            className={`stage-step${index === active ? ' is-active' : ''}`}
+            key={item.title}
+            data-index={index}
+          >
+            <span className="stage-step-node" aria-hidden="true">[ {item.node} ]</span>
+            <h3 className="stage-step-title">{item.title}</h3>
+            <p className="stage-step-desc">{item.description}</p>
+            <ul className="stage-step-evidence">
+              {item.evidence.map((line) => (
+                <li key={line}>
+                  <span aria-hidden="true">&gt; </span>
+                  {line}
+                </li>
+              ))}
+            </ul>
+            <p className="stage-step-stack">{item.tag}</p>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }

@@ -9,7 +9,7 @@ const FPS = 12;
  * nebula light. Runs only while on screen; with reduced motion it stays a
  * still drawing. Decorative: the card's text describes the project.
  */
-export default function AsciiFlow({ lines }) {
+export default function AsciiFlow({ lines, className = '' }) {
   const reducedMotion = useReducedMotion();
   const wires = useMemo(() => findWires(lines), [lines]);
   const wrapRef = useRef(null);
@@ -63,7 +63,7 @@ export default function AsciiFlow({ lines }) {
   }, [lines, wires, reducedMotion, still]);
 
   return (
-    <div className="ascii-flow" ref={wrapRef} aria-hidden="true">
+    <div className={`ascii-flow ${className}`.trim()} ref={wrapRef} aria-hidden="true">
       <pre className="ascii-flow-base" ref={refs.base}>{still}</pre>
       <pre className="ascii-flow-trail" ref={refs.trail} />
       <pre className="ascii-flow-head" ref={refs.head} />

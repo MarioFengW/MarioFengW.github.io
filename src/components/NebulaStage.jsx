@@ -4,6 +4,9 @@ import { stageShape } from '../lib/stages';
 import useAsciiLoop from '../hooks/useAsciiLoop';
 
 const MORPH_S = 0.7; // seconds for the gas to re-form into the next shape
+const WIDE_COLS = 100; // cells across at which the shape moves to the left
+const REGION = 0.5; // share of the width the shape occupies on wide screens
+const THIN = 0.3; // gas density multiplier behind the text column
 
 /**
  * The hero's nebula, sculpted: the same gas takes the shape of the active
@@ -27,7 +30,11 @@ export default function NebulaStage({ stage = 0, playing = true }) {
       const morph = morphRef.current;
       if (morph.start === null) morph.start = t;
       const k = playing ? Math.min(1, (t - morph.start) / MORPH_S) : 1;
-      const shape = stageShape(cols, rows, t, morph.to, morph.from, k);
+      // Wide screens: the shape lives on the left, the text column on the right
+      // keeps only thin gas. Narrow screens: the shape uses the full width.
+      const region = cols >= WIDE_COLS ? Math.round(cols * REGION) : cols;
+      const inner = stageShape(region, rows, t, morph.to, morph.from, k);
+      const shape = region === cols ? inner : (x, y) => (x < region ? inner(x, y) : THIN);
       const frames = renderNebulaLayers(cols, rows, t, null, shape);
       layerRefs.current.forEach((node, index) => {
         if (node) node.textContent = frames[index];
