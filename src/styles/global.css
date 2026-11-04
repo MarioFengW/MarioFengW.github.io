@@ -762,3 +762,20 @@ main { position: relative; z-index: 1; }
   :root { --fs-xs: .86rem; --fs-sm: .98rem; --fs-base: 1.1rem; --fs-lg: 1.2rem; }
   body { font-size: 17px; }
 }
+
+/* ------------------------------------------------------- layout audit --- */
+/* Grid and flex items default to min-width: auto, so a wide ASCII diagram made
+   project cards wider than the phone screen. Let them shrink; the diagram
+   scrolls inside its own box instead. */
+.project-card, .project-inner, .project-body, .project-main, .project-detail { min-width: 0; }
+/* The full-bleed expertise track is sized with 100vw, which includes the
+   scrollbar: clip the overflow on the x axis only (clip keeps sticky working). */
+.stages { overflow-x: clip; }
+/* Diagrams fit the card on phones instead of scrolling: the longest line is
+   46 cells, so the cell size follows the screen width. No visible scrollbar
+   (on desktop the line never overflows; it would read as a stray rule). */
+.ascii-flow { scrollbar-width: none; }
+.ascii-flow::-webkit-scrollbar { display: none; }
+@media (max-width: 560px) {
+  .project-main .ascii-flow pre { font-size: clamp(8px, 2.55vw, 12px); }
+}
