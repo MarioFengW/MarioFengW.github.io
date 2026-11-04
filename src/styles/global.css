@@ -314,57 +314,65 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .weather-status-note { margin-top: 12px; color: var(--ink-faint); font-size: var(--fs-xs); }
 
 /* ---------------------------------------------------------- expertise --- */
-/* Rows, like `ls -l`: what · why · with what. */
-.expertise-list { border-top: 1px solid var(--line-strong); }
-.expertise-row {
-  display: grid; grid-template-columns: 11ch minmax(0, 14rem) minmax(0, 1fr) minmax(0, 13rem);
-  gap: 8px 40px; align-items: baseline;
-  padding: 26px 0; border-bottom: 1px solid var(--line);
+/* Scrollytelling: a sticky nebula stage beside three steps. The gas re-forms
+   into each area's shape as its step crosses the middle of the screen. */
+.stage-grid {
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(32px, 6vw, 80px); align-items: start;
 }
-.expertise-title { font-size: var(--fs-lg); font-weight: 700; line-height: 1.35; }
-.expertise-desc { max-width: 54ch; color: var(--ink-dim); font-size: var(--fs-sm); }
-.expertise-stack { color: var(--accent); font-size: var(--fs-xs); text-align: right; }
-
-/* The pipeline those rows belong to: data -> model -> app -> deploy, with one
-   packet travelling the wire. Constant motion, so linear and stepped per cell. */
-.pipeline { position: relative; margin-bottom: 28px; overflow-x: auto; color: var(--ink-faint); font-size: var(--fs-sm); }
-.pipeline-wire { margin: 0; font: inherit; line-height: 1.6; white-space: pre; }
-.pipeline-packet {
-  position: absolute; top: 0; left: 0; width: 1ch; line-height: 1.6;
-  color: var(--accent); pointer-events: none;
-  animation: packet 5.5s steps(55, end) infinite;
+.stage-view { position: sticky; top: calc(var(--nav-h) + 32px); display: grid; gap: 14px; }
+.stage-frame {
+  position: relative; height: min(62vh, 520px);
+  border: 1px solid var(--line); background: var(--bg-raised); overflow: hidden;
 }
-.pipeline-packet::before { content: '>'; }
-@keyframes packet { from { transform: translateX(0); } to { transform: translateX(55ch); } }
-.expertise-node { color: var(--accent); font-size: var(--fs-xs); white-space: nowrap; }
-
-/* --------------------------------------------------------------- now --- */
-/* A terminal session: status bar, `ls -l`, running processes. */
-.now-term { display: grid; gap: 10px; max-width: 72ch; font-size: var(--fs-sm); }
-.now-line { margin: 0; }
-.now-cmd { margin-top: 18px; color: var(--ink); }
-.now-cmd:first-child { margin-top: 0; }
-.now-prompt { color: var(--accent); }
-.now-arg { color: var(--ink-dim); }
-.now-place { color: var(--ink-dim); }
-.now-bar { color: var(--signal); white-space: pre; overflow-x: auto; font-variant-numeric: tabular-nums; }
-.now-courses li { display: grid; grid-template-columns: 11ch 7ch minmax(0, 1fr); gap: 16px; padding: 4px 0; }
-.now-perm { color: var(--ink-faint); }
-.now-code { color: var(--accent); }
-.now-title { color: var(--ink); }
-.now-building li { padding: 4px 0; color: var(--ink); }
-.now-run { color: var(--ok); }
+.nebula-stage .ascii-field-pre { font-size: 12px; line-height: 14px; }
+.stage-caption { position: absolute; left: 10px; bottom: 10px; margin: 0; padding: 4px 8px; background: var(--bg-raised); color: var(--ink-dim); font-size: var(--fs-xs); }
+.stage-caption-node { color: var(--accent); }
+.stage-wire {
+  margin: 0; color: var(--ink-faint); font-size: var(--fs-xs); white-space: nowrap; overflow-x: auto;
+  font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0;
+}
+.stage-wire span { transition: color .25s var(--ease); }
+.stage-wire .is-active { color: var(--accent); }
+.stage-steps { display: grid; }
+.stage-step {
+  min-height: 62vh; display: flex; flex-direction: column; justify-content: center; gap: 12px;
+  padding: 32px 0; border-top: 1px solid var(--line);
+  color: var(--ink-faint); transition: color .3s var(--ease);
+  scroll-snap-align: center;
+}
+.stage-step:first-child { border-top: 0; }
+.stage-step.is-active { color: var(--ink); }
+.stage-step-node { font-size: var(--fs-xs); transition: color .3s var(--ease); }
+.stage-step.is-active .stage-step-node { color: var(--accent); }
+.stage-step-title { font: 400 clamp(1.8rem, 3.4vw, 2.8rem)/1.05 var(--display); text-transform: uppercase; }
+.stage-step-desc { max-width: 46ch; font-size: var(--fs-base); }
+.stage-step-evidence { display: grid; gap: 6px; font-size: var(--fs-sm); }
+.stage-step.is-active .stage-step-evidence span { color: var(--accent); }
+.stage-step-stack { font-size: var(--fs-xs); }
+.stage-step.is-active .stage-step-stack { color: var(--signal); }
 
 /* -------------------------------------------------- project diagrams --- */
-.project-diagram {
-  margin: 22px 0 0; color: var(--ink-faint); font: var(--fs-xs)/1.5 var(--mono);
-  white-space: pre; overflow-x: auto;
+/* Architecture drawings whose wires carry packets of nebula light. Drawn cell
+   by cell: ligatures off, or "-->" would collapse into one glyph. */
+.ascii-flow { position: relative; margin-top: 22px; overflow-x: auto; }
+.ascii-flow pre {
+  margin: 0; font: var(--fs-xs)/1.5 var(--mono); white-space: pre;
+  font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0;
 }
+.ascii-flow-base { color: var(--ink-faint); }
+.ascii-flow-trail, .ascii-flow-head { position: absolute; inset: 0; pointer-events: none; }
+.ascii-flow-trail { color: var(--neb-rose); }
+.ascii-flow-head { color: var(--neb-core); text-shadow: 0 0 6px var(--neb-glow); }
 
-/* ----------------------------------------------------------- skyline --- */
-.skyline {
-  margin: 48px 0 0; color: var(--line-strong); font: clamp(.5rem, 1.6vw, .8rem)/1.15 var(--mono);
-  white-space: pre; overflow: hidden;
+/* ------------------------------------------------------- nebula outro --- */
+/* The hero's nebula returns at the end of the page, rising behind the contact. */
+.contact { position: relative; isolation: isolate; overflow: clip; }
+.contact > :not(.contact-field) { position: relative; z-index: 1; }
+.contact-field {
+  z-index: 0; left: calc(50% - 50vw); right: auto; width: 100vw;
+  -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, .9) 0%, rgba(0, 0, 0, .35) 45%, transparent 85%);
+  mask-image: linear-gradient(to top, rgba(0, 0, 0, .9) 0%, rgba(0, 0, 0, .35) 45%, transparent 85%);
 }
 
 /* --------------------------------------------------------- experience --- */
@@ -523,6 +531,10 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 /* --------------------------------------------------------- responsive --- */
 @media (max-width: 1080px) { .scroll-meter { display: none; } .theme-toggle { margin-left: auto; } }
 @media (max-width: 860px) {
+  .stage-grid { grid-template-columns: 1fr; gap: 0; }
+  .stage-view { top: calc(var(--nav-h) + 8px); z-index: 2; background: var(--bg); padding-bottom: 8px; }
+  .stage-frame { height: 34vh; }
+  .stage-step { min-height: 54vh; }
   .nav-toggle { display: block; }
   /* Menu drops in (opacity + small translate), items follow with a 40ms stagger.
      visibility keeps closed links out of the tab order without display:none. */
@@ -545,8 +557,6 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   }
   .links a { display: flex; align-items: center; min-height: 48px; font-size: .95rem; color: var(--ink); }
   .about-grid { grid-template-columns: 1fr; }
-  .expertise-row { grid-template-columns: 1fr; gap: 6px; }
-  .expertise-stack { text-align: left; }
   .project-body { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
@@ -571,8 +581,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
    keep colour/opacity feedback and state changes. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .caret, .pipeline-packet { animation: none; }
-  .pipeline-packet { display: none; }
+  .caret { animation: none; }
   .btn:active, .socials a:active, .nav-toggle:active, .theme-toggle:active, .project-cta:active { transform: none; }
   .links, .links.is-open, .links li, .links.is-open li { transform: none; transition-delay: 0s; }
   .page-transition { display: none; }
@@ -620,17 +629,38 @@ html[data-booted] .boot { display: none; }
   }
 }
 @keyframes hero-exit { to { opacity: 0; transform: translateY(-48px); } }
-@keyframes field-exit { to { opacity: .15; transform: scale(1.06); } }
+/* Parallax: the gas drifts down while the page scrolls up, so it lags behind the copy. */
+@keyframes field-exit { to { opacity: .2; transform: translateY(32%) scale(1.06); } }
 
 /* Touch: social links get a full 44px target. */
 @media (pointer: coarse) {
   .socials a { min-height: 44px; }
 }
 
-@media (max-width: 560px) {
-  .now-courses li { grid-template-columns: 7ch minmax(0, 1fr); }
-  .now-perm { display: none; }
+
+
+/* ------------------------------------------- scroll reveal (CSS only) --- */
+/* Drawings scan in as they enter, driven by scroll position. Without scroll
+   timelines (or with reduced motion) they are simply visible. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ascii-flow, .stage-frame {
+      animation-name: scan-in;
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
+  }
+}
+@keyframes scan-in {
+  from { clip-path: inset(0 0 100% 0); opacity: .3; }
+  to { clip-path: inset(0); opacity: 1; }
 }
 
-/* Diagrams are drawn cell by cell: no ligatures, or "-->" collapses into one glyph. */
-.pipeline, .project-diagram, .skyline, .now-term { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+/* Gentle snapping: the expertise steps are the only snap points, and proximity
+   snaps only when the visitor stops close to one. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-snap-type: y proximity; }
+}

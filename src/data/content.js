@@ -38,18 +38,24 @@ export const expertise = [
     title: 'Machine Learning & AI',
     description: 'Applied ML research, from model design to deployment.',
     tag: 'Python · scikit-learn',
+    shape: 'clusters forming',
+    evidence: ['MultiView stacking for traffic classification, 89.46% F1', 'Mask R-CNN tomato defect detection, 90% detection rate'],
   },
   {
     node: 'app',
     title: 'Full Stack Development',
     description: 'Web and mobile apps end-to-end, from frontend to database.',
     tag: 'React · Java · Node.js',
+    shape: 'ui · api · data',
+    evidence: ['In & Out: live logistics for a food bank', 'Connect the Schools: matching for 3,000+ schools'],
   },
   {
     node: 'deploy',
     title: 'Cloud & DevOps',
     description: 'Shipped ForgeTask on OCI with Docker and automated CI/CD.',
     tag: 'Docker · Kubernetes · OCI',
+    shape: 'rolling deploy',
+    evidence: ['ForgeTask deployed on OCI with CI/CD and end-to-end tests', 'EPAM NextGen program in Cloud and DevOps'],
   },
 ];
 
@@ -143,19 +149,3 @@ export const projects = [
     ],
   },
 ];
-// Current semester at NTU, shown in the "Now" section. Weeks run Monday to Sunday.
-export const now = {
-  place: 'NTU CSIE, Taipei',
-  semester: { label: 'fall 2026', start: '2026-09-07', weeks: 16 },
-  courses: [
-    { code: 'EE5184', title: 'Machine Learning' },
-    { code: 'AIIM', title: 'AI and Intelligent Medicine' },
-    { code: 'RPL', title: 'Robot Perception and Learning' },
-    { code: 'PP', title: 'Parallel Programming' },
-    { code: 'MSDV', title: 'Middleware for Software-Defined Vehicles' },
-  ],
-  building: [
-    'Predicting first NAFLD detection from health-checkup history',
-    'How demonstrator skill shapes MimicGen-generated robot data',
-  ],
-};

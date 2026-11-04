@@ -23,8 +23,9 @@ export function measureGrid(probeHost, width, height) {
  *   one frame and keeps it (resuming continues from the same moment).
  * - Re-measures on box resize and once web fonts finish loading.
  * - With `trackPointer`, passes the eased pointer position in cells (or null).
+ * - Changing `redrawKey` restarts the loop, which also repaints a paused frame.
  */
-export default function useAsciiLoop(wrapRef, probeRef, draw, { playing = true, fps = 24, trackPointer = false } = {}) {
+export default function useAsciiLoop(wrapRef, probeRef, draw, { playing = true, fps = 24, trackPointer = false, redrawKey = null } = {}) {
   const drawRef = useRef(draw);
   drawRef.current = draw;
   const elapsedRef = useRef(0); // seconds shown so far; survives pause/resume
@@ -127,5 +128,5 @@ export default function useAsciiLoop(wrapRef, probeRef, draw, { playing = true, 
       window.removeEventListener('resize', refresh);
       window.removeEventListener('pointermove', handlePointerMove);
     };
-  }, [wrapRef, probeRef, playing, fps, trackPointer]);
+  }, [wrapRef, probeRef, playing, fps, trackPointer, redrawKey]);
 }
