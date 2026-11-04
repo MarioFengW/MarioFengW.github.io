@@ -84,86 +84,88 @@ export default function Footer() {
         Open to internships, research collaborations and freelance work in AI/ML, full-stack development and DevOps.
       </p>
 
-      <form className="composer" onSubmit={(event) => event.preventDefault()} aria-label="Write me an email">
-        <p className="composer-cmd" aria-hidden="true">
-          <span className="composer-prompt">$ </span>mail mario
-        </p>
-        <label className="composer-row">
-          <span className="composer-key">from:</span>
-          <input
-            type="text"
-            name="name"
-            autoComplete="name"
-            placeholder="your name"
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
-        </label>
-        <fieldset className="composer-row">
-          <legend className="composer-key">about:</legend>
-          <div className="composer-topics">
-            {TOPICS.map((item) => (
-              <label key={item} className={`composer-topic${item === topic ? ' is-on' : ''}`}>
-                <input
-                  type="radio"
-                  name="topic"
-                  value={item}
-                  checked={item === topic}
-                  onChange={() => setTopic(item)}
-                />
-                <span aria-hidden="true">{item === topic ? '(*)' : '( )'}</span> {item}
-              </label>
-            ))}
+      <div className="contact-body">
+        <div className="contact-side">
+          <div className="contact-map">
+            <AsciiFlow className="contact-wires" lines={ROUTES} bursts={bursts} />
+            <ul className="contact-routes">
+              {CHANNELS.map((link, index) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    {...linkProps(link.href)}
+                    onPointerEnter={() => finePointer() && send(index)}
+                    onFocus={() => send(index)}
+                  >
+                    <span className="contact-route-label">{link.label}</span>
+                    <span className="contact-route-handle">{link.handle}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
-        </fieldset>
-        <label className="composer-row composer-row-message">
-          <span className="composer-key">message:</span>
-          <textarea
-            name="message"
-            rows={4}
-            placeholder="what are you working on?"
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-          />
-        </label>
-        <div className="composer-actions">
-          <a className="btn btn-primary composer-send" href={href}>
-            <span aria-hidden="true">&gt;</span>
-            <span>send</span>
-          </a>
-          <span className="composer-note">opens your mail app with this filled in</span>
+          <div className="contact-direct">
+            <a className="contact-email" href={`mailto:${profile.email}`}>{profile.email}</a>
+            <button type="button" className="contact-copy-btn" onClick={copy} aria-live="polite">
+              {copied ? '[ copied ]' : '[ copy ]'}
+            </button>
+            {time && (
+              <span className="contact-time">
+                {time} in {currentCity.name}
+              </span>
+            )}
+          </div>
         </div>
-      </form>
-
-      <div className="contact-direct">
-        <a className="contact-email" href={`mailto:${profile.email}`}>{profile.email}</a>
-        <button type="button" className="contact-copy-btn" onClick={copy} aria-live="polite">
-          {copied ? '[ copied ]' : '[ copy ]'}
-        </button>
-        {time && (
-          <span className="contact-time">
-            {time} in {currentCity.name}
-          </span>
-        )}
-      </div>
-
-      <div className="contact-map">
-        <AsciiFlow className="contact-wires" lines={ROUTES} bursts={bursts} />
-        <ul className="contact-routes">
-          {CHANNELS.map((link, index) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                {...linkProps(link.href)}
-                onPointerEnter={() => finePointer() && send(index)}
-                onFocus={() => send(index)}
-              >
-                <span className="contact-route-label">{link.label}</span>
-                <span className="contact-route-handle">{link.handle}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
+        <form className="composer" onSubmit={(event) => event.preventDefault()} aria-label="Write me an email">
+          <p className="composer-cmd" aria-hidden="true">
+            <span className="composer-prompt">$ </span>mail mario
+          </p>
+          <label className="composer-row">
+            <span className="composer-key">from:</span>
+            <input
+              type="text"
+              name="name"
+              autoComplete="name"
+              placeholder="your name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+            />
+          </label>
+          <fieldset className="composer-row">
+            <legend className="composer-key">about:</legend>
+            <div className="composer-topics">
+              {TOPICS.map((item) => (
+                <label key={item} className={`composer-topic${item === topic ? ' is-on' : ''}`}>
+                  <input
+                    type="radio"
+                    name="topic"
+                    value={item}
+                    checked={item === topic}
+                    onChange={() => setTopic(item)}
+                  />
+                  <span aria-hidden="true">{item === topic ? '(*)' : '( )'}</span> {item}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <label className="composer-row composer-row-message">
+            <span className="composer-key">message:</span>
+            <textarea
+              name="message"
+              rows={4}
+              placeholder="what are you working on?"
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+            />
+          </label>
+          <div className="composer-actions">
+            <a className="btn btn-primary composer-send" href={href}>
+              <span aria-hidden="true">&gt;</span>
+              <span>send</span>
+            </a>
+            <span className="composer-note">opens your mail app with this filled in</span>
+          </div>
+        </form>
       </div>
 
       <div className="copyright">

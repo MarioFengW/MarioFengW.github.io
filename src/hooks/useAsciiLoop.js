@@ -8,9 +8,13 @@ export function measureGrid(probeHost, width, height) {
   probe.style.visibility = 'hidden';
   probe.style.position = 'absolute';
   probeHost.appendChild(probe);
-  const charWidth = probe.getBoundingClientRect().width / 20;
+  const rendered = probe.getBoundingClientRect().width;
+  // Under CSS `zoom`, rects are zoomed but computed line-height is not: scale it
+  // by the same factor so rows and columns stay in one unit (1 without zoom).
+  const zoom = probe.offsetWidth ? rendered / probe.offsetWidth : 1;
+  const charWidth = rendered / 20;
   probeHost.removeChild(probe);
-  const lineHeight = parseFloat(window.getComputedStyle(probeHost).lineHeight);
+  const lineHeight = parseFloat(window.getComputedStyle(probeHost).lineHeight) * zoom;
   return { ...gridSize(width, height, charWidth, lineHeight), charWidth, lineHeight };
 }
 

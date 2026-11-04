@@ -53,6 +53,7 @@
   --gutter: clamp(16px, 4vw, 40px);
   --max: 1120px;
   --nav-h: 61px;
+  --zoom: 1; /* page scale; viewport heights divide by it (see below) */
   /* Duration scale. */
   --dur-press: .12s;   /* :active scale feedback */
   --dur-ui: .18s;      /* hover colour, small state changes */
@@ -179,7 +180,7 @@ ul, ol { list-style: none; }
 /* --------------------------------------------------------------- hero --- */
 .hero {
   position: relative;
-  min-height: calc(100svh - var(--nav-h));
+  min-height: calc(100svh / var(--zoom) - var(--nav-h));
   display: flex; align-items: center;
   /* clip, not hidden: hidden would make the hero a scroll container, and the
      scroll-driven exit (view() timeline) would track the hero instead of the page. */
@@ -304,7 +305,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 }
 
 .stage-step {
-  min-height: 62vh; display: flex; flex-direction: column; justify-content: center; gap: 12px;
+  min-height: calc(62vh / var(--zoom)); display: flex; flex-direction: column; justify-content: center; gap: 12px;
   padding: 32px 0; border-top: 1px solid var(--line);
   color: var(--ink-faint); transition: color .7s var(--ease); /* matches MORPH_S */
 }
@@ -716,4 +717,29 @@ main { position: relative; z-index: 1; }
 @media (max-width: 560px) {
   .composer-row { grid-template-columns: 1fr; gap: 4px; }
   .composer-actions { padding-left: 0; }
+}
+
+/* ------------------------------------------------------------- scale --- */
+/* On wide screens the whole page renders at 75%: the ASCII cells get finer and
+   more of the nebula fits on screen. Viewport heights are divided by --zoom so
+   full-screen pieces still fill the screen. Phones and tablets stay at 100%. */
+@media (min-width: 1100px) {
+  :root { --zoom: .75; }
+  body { zoom: .75; }
+}
+
+/* ----------------------------------------------------------- contact --- */
+/* Two columns on wide screens: you (and every other way to reach me) on the
+   left, the mail composer on the right. */
+.contact-body {
+  display: grid; gap: 32px clamp(32px, 6vw, 80px); margin-top: 32px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: start;
+}
+.contact-body .composer { margin-top: 0; max-width: none; }
+.contact-side { display: grid; gap: 18px; align-content: start; }
+.contact-side .contact-map { margin-top: 0; }
+.contact-side .contact-direct { margin-top: 0; }
+@media (max-width: 860px) {
+  .contact-body { grid-template-columns: 1fr; }
+  .contact-body .composer { order: -1; } /* on phones, writing comes first */
 }
