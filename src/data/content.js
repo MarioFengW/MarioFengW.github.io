@@ -1,9 +1,9 @@
 export const profile = {
   name: 'Mario Feng Wu',
-  role: 'Computer Science Engineering Student & AI/ML Developer',
+  role: 'Computer Science student & AI/ML engineer',
   summary: 'I build machine-learning models and the full-stack, cloud-deployed products around them.',
   status: 'Open to internships & research collaborations',
-  intro: "I'm Mario, a Computer Science student originally from Guadalajara, Mexico, now based in Taipei for an exchange semester at NTU. My focus is AI/ML, full-stack development and cloud infrastructure. Outside of that, you'll usually find me gaming, reading or with headphones on. Here's a look at what I've been building.",
+  intro: "I'm Mario, a Computer Science student at Tec de Monterrey, spending this semester on exchange at NTU. I train models, then build and deploy the products around them.",
   location: 'Guadalajara, Mexico -> Taipei, Taiwan',
   email: 'mario.fengw@gmail.com',
 };
@@ -30,25 +30,22 @@ export const socials = [
   { label: 'github', href: 'https://github.com/MarioFengW', primary: true },
   { label: 'linkedin', href: 'https://www.linkedin.com/in/mariofengwu/', primary: true },
   { label: 'discord', href: 'https://discord.com/users/1162141976813117490' },
-  { label: 'instagram', href: 'https://www.instagram.com/takatakata.195?stkn=cjJyenJrZm92dWVy' },
-  { label: 'facebook', href: 'https://www.facebook.com/share/19M41BFzVB/' },
-  { label: 'steam', href: 'https://steamcommunity.com/profiles/76561199147883762/' },
 ];
 
 export const expertise = [
   {
     title: 'Machine Learning & AI',
-    description: "The area I'm most passionate about, applied ML research, from designing models to shipping them.",
+    description: 'Applied ML research, from model design to deployment.',
     tag: 'Python · scikit-learn',
   },
   {
     title: 'Full Stack Development',
-    description: 'Building web and mobile apps end-to-end, from frontend to database.',
+    description: 'Web and mobile apps end-to-end, from frontend to database.',
     tag: 'React · Java · Node.js',
   },
   {
     title: 'Cloud & DevOps',
-    description: "I'm interested in infrastructure as part of the product, not an afterthought.",
+    description: 'Shipped ForgeTask on OCI with Docker and automated CI/CD.',
     tag: 'Docker · Kubernetes · OCI',
   },
 ];
@@ -93,7 +90,7 @@ export const projects = [
   {
     title: 'ForgeTask',
     period: 'Feb 2026 - Jun 2026',
-    context: 'Development and Deployment of Software Systems',
+    context: 'Course project · Development and Deployment of Software Systems',
     description: 'AI-powered project management platform with a RAG reporting pipeline, deployed on OCI with automated CI/CD and end-to-end testing.',
     stack: ['React', 'Java', 'OCI', 'Docker'],
     link: 'https://github.com/JRV-XVI/oci-chatbot'
@@ -101,7 +98,7 @@ export const projects = [
   {
     title: 'In & Out',
     period: 'Aug 2025 - Dec 2025',
-    context: 'Cybersecurity & Software System',
+    context: 'Course project · Cybersecurity & Software System',
     description: 'Digital transformation platform for Banco de Alimentos Jalisco, coordinating donors, drivers and admins with real-time state tracking and vehicle matching.',
     stack: ['React Native', 'TypeScript', 'Supabase'],
     link: 'https://github.com/JRV-XVI/in-and-out'
@@ -109,7 +106,7 @@ export const projects = [
   {
     title: 'Connect the Schools',
     period: 'Feb 2025 - Jun 2025',
-    context: 'Software Construction',
+    context: 'Course project · Software Construction',
     metric: '3,000+ schools',
     description: 'Educational support platform connecting 3,000+ schools with partners through similarity-based needs matching.',
     stack: ['React', 'Node.js', 'PostgreSQL'],
@@ -119,7 +116,7 @@ export const projects = [
     title: 'Hack2Dawn',
     period: 'Feb 2025 - May 2025',
     context: 'PawnGuard Capture The Flag',
-    description: 'Hack2Dawn is a Capture The Flag (CTF) cybersecurity competition where participants face challenges in web exploitation, reverse engineering, and cryptography. Analyze, exploit, and capture the flags before anyone else.',
+    description: "Built the website for PawnGuard's Capture The Flag competition, where players solve web exploitation, reverse engineering and cryptography challenges.",
     stack: ['React', 'Next.js', 'TailwindCSS', 'TypeScript'],
     link: 'https://hack.pawnguard.org'
   },

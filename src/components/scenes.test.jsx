@@ -45,7 +45,10 @@ describe('bootLog', () => {
 });
 
 describe('BootScreen', () => {
-  beforeEach(mockLayout);
+  beforeEach(() => {
+    mockLayout();
+    window.sessionStorage.clear();
+  });
 
   it('server-renders the first log line so it covers the page from the first paint', () => {
     mockReducedMotion(false);
@@ -92,6 +95,19 @@ describe('BootScreen', () => {
     act(() => raf.step(60));
     act(() => raf.step(60 + 400));
     expect(onDone).toHaveBeenCalledTimes(1);
+  });
+
+  it('plays only once per session', () => {
+    mockReducedMotion(false);
+    mockAnimationFrame();
+    const first = render(<BootScreen />);
+    expect(first.container.querySelector('.boot')).not.toBeNull();
+    expect(window.sessionStorage.getItem('boot-seen')).toBe('1');
+    first.unmount();
+    const onDone = vi.fn();
+    const { container } = render(<BootScreen onDone={onDone} />);
+    expect(onDone).toHaveBeenCalledTimes(1);
+    expect(container.querySelector('.boot')).toBeNull();
   });
 
   it('is skipped entirely with reduced motion', () => {

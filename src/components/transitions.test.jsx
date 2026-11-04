@@ -152,19 +152,19 @@ describe('PageTransition', () => {
     expect(overlay).toHaveClass('is-active');
 
     raf.step(0);
-    raf.step(90); // mid-cover
+    raf.step(40); // mid-cover
     const mid = Number(overlay.style.getPropertyValue('--wipe'));
     expect(mid).toBeGreaterThan(0);
     expect(mid).toBeLessThan(1);
     expect(scroll).not.toHaveBeenCalled(); // not before the screen is covered
 
-    raf.step(180); // cover complete -> jump
+    raf.step(80); // cover complete -> jump
     expect(scroll).toHaveBeenCalledTimes(1);
     expect(window.location.hash).toBe('#about');
     expect(document.activeElement).toBe(document.getElementById('about'));
 
-    raf.step(200); // reveal starts
-    raf.step(200 + 300); // reveal complete
+    raf.step(100); // reveal starts
+    raf.step(100 + 120); // reveal complete
     expect(overlay).not.toHaveClass('is-active');
     expect(overlay.style.getPropertyValue('--wipe')).toBe('');
     expect(raf.pending()).toBe(0);

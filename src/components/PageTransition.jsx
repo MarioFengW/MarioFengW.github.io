@@ -4,8 +4,9 @@ import { easeOutCubic, motionTokens } from '../lib/motion-tokens';
 import useReducedMotion from '../hooks/useReducedMotion';
 import { measureGrid } from '../hooks/useAsciiLoop';
 
-const COVER_MS = motionTokens.duration.fast * 1000; // quick: the visitor asked to go somewhere
-const REVEAL_MS = motionTokens.duration.normal * 1000; // a touch slower so the new view settles
+// Under 200ms in total: navigation is frequent, so the wipe must never feel like a wait.
+const COVER_MS = motionTokens.duration.wipeCover * 1000;
+const REVEAL_MS = motionTokens.duration.wipeReveal * 1000;
 
 /** Should this click be turned into an in-page transition? */
 export function getHashTarget(event) {

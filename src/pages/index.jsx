@@ -21,9 +21,7 @@ export default function HomePage() {
         <Hero />
         <div className="wrap">
           <About />
-          <SectionDivider label=">> expertise" />
           <Expertise />
-          <SectionDivider label=">> experience" />
           <Experience />
           <SectionDivider label=">> projects" />
           <Projects />

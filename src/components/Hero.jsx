@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { profile } from '../data/content';
 import useReducedMotion from '../hooks/useReducedMotion';
 import AsciiField from './AsciiField';
-import SocialLinks from './SocialLinks';
 
 /**
  * Hero. Content is visible in the default state (no script-dependent hiding):
@@ -47,7 +46,6 @@ export default function Hero() {
           <span className="status-dot" aria-hidden="true" />
           {profile.status}
         </p>
-        <SocialLinks primaryOnly className="hero-socials" />
       </div>
       <button
         type="button"
@@ -57,9 +55,6 @@ export default function Hero() {
       >
         <span aria-hidden="true">{playing ? '[ || pause ascii ]' : '[ > play ascii ]'}</span>
       </button>
-      <a className="hero-scroll" href="#about">
-        scroll <span className="hero-scroll-arrow" aria-hidden="true">↓</span>
-      </a>
     </section>
   );
 }
