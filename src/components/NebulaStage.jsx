@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { NEBULA_LAYERS, renderNebulaLayers } from '../lib/nebula';
 import { stageShape } from '../lib/stages';
 import useAsciiLoop from '../hooks/useAsciiLoop';
+import { frameRates } from '../lib/motion-tokens';
 
 const MORPH_S = 0.7; // seconds for the gas to re-form into the next shape
 const WIDE_COLS = 100; // cells across at which the shape moves to the left
@@ -18,15 +19,20 @@ export default function NebulaStage({ stage = 0, playing = true }) {
   const probeRef = useRef(null);
   const layerRefs = useRef([]);
   const morphRef = useRef({ from: stage, to: stage, start: null });
+  const [morphing, setMorphing] = useState(false);
 
   useEffect(() => {
     const morph = morphRef.current;
-    if (morph.to === stage) return;
+    if (morph.to === stage) return undefined;
     morphRef.current = { from: morph.to, to: stage, start: null };
+    // Full frame rate only while the gas re-forms; idle drift is cheaper.
+    setMorphing(true);
+    const id = setTimeout(() => setMorphing(false), MORPH_S * 1000 + 50);
+    return () => clearTimeout(id);
   }, [stage]);
 
   const draw = useCallback(
-    (cols, rows, t) => {
+    (cols, rows, t, pointer) => {
       const morph = morphRef.current;
       if (morph.start === null) morph.start = t;
       const k = playing ? Math.min(1, (t - morph.start) / MORPH_S) : 1;
@@ -35,7 +41,7 @@ export default function NebulaStage({ stage = 0, playing = true }) {
       const region = cols >= WIDE_COLS ? Math.round(cols * REGION) : cols;
       const inner = stageShape(region, rows, t, morph.to, morph.from, k);
       const shape = region === cols ? inner : (x, y) => (x < region ? inner(x, y) : THIN);
-      const frames = renderNebulaLayers(cols, rows, t, null, shape);
+      const frames = renderNebulaLayers(cols, rows, t, pointer, shape);
       layerRefs.current.forEach((node, index) => {
         if (node) node.textContent = frames[index];
       });
@@ -44,7 +50,12 @@ export default function NebulaStage({ stage = 0, playing = true }) {
   );
 
   // Paused (reduced motion): repaint once per stage change instead of animating.
-  useAsciiLoop(wrapRef, probeRef, draw, { playing, fps: 20, redrawKey: playing ? null : stage });
+  useAsciiLoop(wrapRef, probeRef, draw, {
+    playing,
+    fps: morphing ? frameRates.morph : frameRates.field,
+    trackPointer: true,
+    redrawKey: playing ? null : stage,
+  });
 
   return (
     <div ref={wrapRef} className="ascii-field nebula-stage" aria-hidden="true">

@@ -43,6 +43,9 @@
   --display: 'Pixelta', var(--mono);
 
   /* Type scale: four steps for body text; display sizes stay fluid. */
+  /* One cell size for every ASCII field, so the nebula keeps its grain across sections. */
+  --cell-font: 13px;
+  --cell-line: 15px;
   --fs-xs: .78rem;
   --fs-sm: .88rem;
   --fs-base: 1rem;
@@ -50,6 +53,12 @@
   --gutter: clamp(16px, 4vw, 40px);
   --max: 1120px;
   --nav-h: 61px;
+  /* Duration scale. */
+  --dur-press: .12s;   /* :active scale feedback */
+  --dur-ui: .18s;      /* hover colour, small state changes */
+  --dur-panel: .22s;   /* accordion, mobile menu */
+  --dur-state: .3s;    /* larger state changes */
+  --dur-ambient: .6s;  /* weather and decorative fades */
   --ease: cubic-bezier(.16, 1, .3, 1); /* strong ease-out: arrivals */
   --ease-move: cubic-bezier(.77, 0, .175, 1); /* on-screen movement */
 }
@@ -143,18 +152,18 @@ ul, ol { list-style: none; }
 .nav-prompt { color: var(--accent); }
 .links { margin-left: 4px; }
 .links ul { display: flex; gap: 22px; }
-.links a { color: var(--ink-dim); font-size: var(--fs-xs); transition: color .18s var(--ease); }
+.links a { color: var(--ink-dim); font-size: var(--fs-xs); transition: color var(--dur-ui) var(--ease); }
 .links a[aria-current] { color: var(--ink); }
 /* Underline grows from the left on hover; stays drawn for the section you're in. */
 .link-label {
   background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px;
-  transition: background-size .2s var(--ease);
+  transition: background-size var(--dur-ui) var(--ease);
 }
 .links a[aria-current] .link-label { background-size: 100% 1px; }
 .nav-toggle, .theme-toggle {
   font: inherit; font-size: var(--fs-xs); color: var(--ink-dim);
   background: none; border: 0; min-height: 44px; padding: 0 4px; cursor: pointer;
-  transition: color .18s var(--ease), transform .12s var(--ease);
+  transition: color var(--dur-ui) var(--ease), transform var(--dur-press) var(--ease);
 }
 .nav-toggle { display: none; color: var(--ink); }
 .theme-toggle { display: inline-flex; align-items: center; gap: .6ch; white-space: nowrap; }
@@ -164,7 +173,7 @@ ul, ol { list-style: none; }
 
 /* Theme switch: the new theme is revealed top-to-bottom like a scanline pass. */
 ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-::view-transition-new(root) { animation: theme-wipe .42s var(--ease) both; }
+::view-transition-new(root) { animation: theme-wipe .42s var(--ease) both; /* one-off View Transition */ }
 @keyframes theme-wipe { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0); } }
 
 /* --------------------------------------------------------------- hero --- */
@@ -181,7 +190,7 @@ ul, ol { list-style: none; }
 .ascii-field-pre {
   position: absolute; inset: 0; margin: 0;
   color: var(--field);
-  font: 400 13px/15px var(--mono);
+  font: 400 var(--cell-font)/var(--cell-line) var(--mono);
   letter-spacing: 0; white-space: pre; user-select: none;
 }
 .nebula-dust { color: var(--neb-dust); }
@@ -211,7 +220,7 @@ ul, ol { list-style: none; }
   display: inline-flex; align-items: center; gap: 1ch; min-height: 44px; padding: 0 18px;
   border: 1px solid var(--line-strong); background: var(--panel-bg); color: var(--ink);
   font-size: var(--fs-sm);
-  transition: background-color .18s var(--ease), color .18s var(--ease), border-color .18s var(--ease), transform .12s var(--ease);
+  transition: background-color var(--dur-ui) var(--ease), color var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease), transform var(--dur-press) var(--ease);
 }
 .btn-primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .btn:active { transform: scale(.97); }
@@ -221,7 +230,7 @@ ul, ol { list-style: none; }
   position: absolute; z-index: 1; bottom: 14px; left: var(--gutter);
   min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer;
   color: var(--ink-faint); font: inherit; font-size: var(--fs-xs); letter-spacing: .04em;
-  transition: color .18s var(--ease);
+  transition: color var(--dur-ui) var(--ease);
 }
 
 /* ------------------------------------------------------------ socials --- */
@@ -229,9 +238,9 @@ ul, ol { list-style: none; }
 .socials a {
   display: inline-flex; align-items: center; min-height: 32px;
   color: var(--ink-dim); font-size: var(--fs-sm);
-  transition: color .18s var(--ease), transform .12s var(--ease);
+  transition: color var(--dur-ui) var(--ease), transform var(--dur-press) var(--ease);
 }
-.socials a span { color: var(--ink-faint); transition: color .18s var(--ease); }
+.socials a span { color: var(--ink-faint); transition: color var(--dur-ui) var(--ease); }
 .socials a:active { transform: scale(.97); }
 
 /* ----------------------------------------------------- section shell --- */
@@ -257,7 +266,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 }
 .section-divider-pre {
   margin: 0; color: var(--accent); opacity: .55;
-  font: 400 13px/15px var(--mono); white-space: pre; user-select: none;
+  font: 400 var(--cell-font)/var(--cell-line) var(--mono); white-space: pre; user-select: none;
 }
 .section-divider-label {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
@@ -282,12 +291,12 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   left: calc(50% - 50vw); width: 100vw; overflow: hidden;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 80%, transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 80%, transparent 100%);
-  transition: background-color .08s;
+  transition: background-color var(--dur-press);
 }
 .weather-backdrop-pre {
   margin: 0; color: var(--accent); opacity: .5;
-  font: 400 13px/15px var(--mono); white-space: pre; user-select: none;
-  transition: color .6s var(--ease), opacity .6s var(--ease);
+  font: 400 var(--cell-font)/var(--cell-line) var(--mono); white-space: pre; user-select: none;
+  transition: color var(--dur-ambient) var(--ease), opacity var(--dur-ambient) var(--ease);
 }
 .weather-backdrop[data-type='sun'] .weather-backdrop-pre { color: var(--signal); opacity: .32; }
 .weather-backdrop[data-type='night'] .weather-backdrop-pre { color: var(--neb-core); opacity: .5; }
@@ -317,22 +326,26 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 /* Scrollytelling over the whole section: the nebula is a sticky, full-bleed
    background (one screen tall, pulled out of the flow by a negative margin) and
    the steps scroll over it on the right. The gas takes its shape on the left. */
-.stages { position: relative; }
+.stages { position: relative; clip-path: inset(0 -100vw); } /* keep the sticky background inside the section vertically; full bleed sideways */
 .stage-bg {
   position: sticky; top: 0; z-index: 0;
   height: 100svh; margin-bottom: -100svh;
   width: 100vw; margin-left: calc(50% - 50vw);
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
 }
-.nebula-stage .ascii-field-pre { font-size: 12px; line-height: 14px; }
+/* Edge fades painted once (static overlays), not a mask re-composited per frame. */
+.stage-bg::before, .stage-bg::after {
+  content: ''; position: absolute; left: 0; right: 0; height: 14%;
+  z-index: 1; pointer-events: none;
+}
+.stage-bg::before { top: 0; background: linear-gradient(to bottom, var(--bg), transparent); }
+.stage-bg::after { bottom: 0; background: linear-gradient(to top, var(--bg), transparent); }
+.stage-hud { z-index: 2; padding: 8px 12px; background: var(--bg); }
 .stage-hud {
   position: absolute; bottom: 16%; left: max(var(--gutter), calc(50vw - var(--max) / 2 + var(--gutter)));
   display: grid; gap: 8px;
 }
 .stage-caption { margin: 0; color: var(--ink-dim); font-size: var(--fs-xs); }
-.stage-caption-node { color: var(--accent); }
 .stage-pipeline pre { color: var(--ink-faint); }
 .stage-steps {
   position: relative; z-index: 1;
@@ -342,12 +355,12 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .stage-step {
   min-height: 62vh; display: flex; flex-direction: column; justify-content: center; gap: 12px;
   padding: 32px 0; border-top: 1px solid var(--line);
-  color: var(--ink-faint); transition: color .3s var(--ease);
+  color: var(--ink-faint); transition: color .7s var(--ease); /* matches MORPH_S */
   scroll-snap-align: center;
 }
 .stage-step:first-child { border-top: 0; }
 .stage-step.is-active { color: var(--ink); }
-.stage-step-node { font-size: var(--fs-xs); transition: color .3s var(--ease); }
+.stage-step-node { font-size: var(--fs-xs); transition: color .7s var(--ease); /* matches MORPH_S */ }
 .stage-step.is-active .stage-step-node { color: var(--accent); }
 .stage-step-title { font: 400 clamp(1.8rem, 3.4vw, 2.8rem)/1.05 var(--display); text-transform: uppercase; }
 .stage-step-desc { max-width: 46ch; font-size: var(--fs-base); }
@@ -393,10 +406,10 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .exp-node {
   position: relative; z-index: 1; justify-self: center;
   width: 11px; height: 11px; border: 2px solid var(--line-strong); background: var(--bg);
-  transition: background-color .2s var(--ease), border-color .2s var(--ease);
+  transition: background-color var(--dur-ui) var(--ease), border-color var(--dur-ui) var(--ease);
 }
 .exp-item[data-passed] .exp-node { background: var(--accent); border-color: var(--accent); }
-.exp-title { font-weight: 700; font-size: var(--fs-base); transition: color .18s var(--ease); }
+.exp-title { font-weight: 700; font-size: var(--fs-base); transition: color var(--dur-ui) var(--ease); }
 .exp-at { color: var(--ink-dim); font-weight: 400; }
 .exp-metric {
   padding: 1px 8px; border: 1px solid var(--line-strong);
@@ -407,11 +420,11 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .exp-item.is-open .exp-title { color: var(--accent); }
 /* Accordion: grid-rows 0fr -> 1fr (no JS height maths). Closed content is
    inert and becomes invisible once collapsed, so it is out of the tab order. */
-.exp-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .22s var(--ease); }
+.exp-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--dur-panel) var(--ease); }
 .exp-item.is-open .exp-panel { grid-template-rows: 1fr; }
 .exp-panel-inner {
   min-height: 0; overflow: hidden; padding-left: calc(2ch + 16px);
-  visibility: hidden; transition: visibility 0s linear .22s;
+  visibility: hidden; transition: visibility 0s linear var(--dur-panel);
 }
 .exp-item.is-open .exp-panel-inner { visibility: visible; transition-delay: 0s; }
 .exp-panel-inner::after { content: ''; display: block; height: 26px; }
@@ -461,7 +474,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .project-cta {
   display: inline-flex; align-items: center; gap: .8ch; min-height: 44px; margin-top: 22px; padding: 0 16px;
   border: 1px solid var(--ink); color: var(--ink); font-size: var(--fs-sm);
-  transition: background-color .18s var(--ease), color .18s var(--ease), transform .12s var(--ease);
+  transition: background-color var(--dur-ui) var(--ease), color var(--dur-ui) var(--ease), transform var(--dur-press) var(--ease);
 }
 .project-cta:active { transform: scale(.97); }
 
@@ -478,10 +491,10 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 .contact-routes li { height: 3.6em; }
 .contact-routes a {
   display: inline-flex; gap: 2ch; align-items: baseline; min-height: 1.8em;
-  color: var(--ink); transition: color .18s var(--ease);
+  color: var(--ink); transition: color var(--dur-ui) var(--ease);
 }
 .contact-route-label { min-width: 8ch; }
-.contact-route-handle { color: var(--ink-dim); transition: color .18s var(--ease); }
+.contact-route-handle { color: var(--ink-dim); transition: color var(--dur-ui) var(--ease); }
 .contact-routes li:first-child .contact-route-handle { color: var(--signal); }
 .copyright-journey pre { font: var(--fs-xs)/1.5 var(--mono); }
 .copyright {
@@ -519,7 +532,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 }
 .page-transition-pre {
   position: relative; margin: 0; color: var(--accent);
-  font: 400 13px/15px var(--mono); white-space: pre; user-select: none;
+  font: 400 var(--cell-font)/var(--cell-line) var(--mono); white-space: pre; user-select: none;
 }
 
 /* Generic short crossfade for content that swaps in place. */
@@ -546,17 +559,17 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
     position: absolute; top: 100%; left: 0; right: 0; margin: 0;
     background: var(--bg); border-bottom: 1px solid var(--line);
     visibility: hidden; opacity: 0; transform: translateY(-6px);
-    transition: opacity .12s var(--ease), transform .12s var(--ease), visibility 0s linear .12s;
+    transition: opacity var(--dur-press) var(--ease), transform var(--dur-press) var(--ease), visibility 0s linear var(--dur-press);
   }
   .links.is-open {
     visibility: visible; opacity: 1; transform: none;
-    transition: opacity .2s var(--ease), transform .2s var(--ease), visibility 0s;
+    transition: opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease), visibility 0s;
   }
   .links ul { flex-direction: column; gap: 0; padding: 8px var(--gutter) 16px; }
   .links li { opacity: 0; transform: translateY(-4px); transition: opacity .1s, transform .1s; }
   .links.is-open li {
     opacity: 1; transform: none;
-    transition: opacity .2s var(--ease), transform .2s var(--ease);
+    transition: opacity var(--dur-ui) var(--ease), transform var(--dur-ui) var(--ease);
     transition-delay: calc(var(--i, 0) * 40ms);
   }
   .links a { display: flex; align-items: center; min-height: 48px; font-size: .95rem; color: var(--ink); }
@@ -564,6 +577,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
   .project-body { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
+  .nebula-stage { --cell-font: 15px; --cell-line: 17px; } /* fewer cells per frame on phones */
   .contact-route-handle { display: none; }
   .contact-routes li:first-child .contact-route-handle { display: inline; font-size: var(--fs-xs); }
   body { font-size: 14px; }
@@ -606,7 +620,7 @@ html[data-booted] .boot { display: none; }
 @keyframes boot-failsafe { to { visibility: hidden; } }
 .boot-wipe {
   position: absolute; inset: 0; margin: 0; color: var(--accent); opacity: .7;
-  font: 400 13px/15px var(--mono); white-space: pre; user-select: none;
+  font: 400 var(--cell-font)/var(--cell-line) var(--mono); white-space: pre; user-select: none;
 }
 .boot-log {
   position: absolute; left: var(--gutter); bottom: clamp(48px, 12vh, 120px); margin: 0;
@@ -669,4 +683,22 @@ html[data-booted] .boot { display: none; }
    snaps only when the visitor stops close to one. */
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-snap-type: y proximity; }
+}
+
+/* ----------------------------------------------------- timeline packet --- */
+/* The experience rail speaks the same language as the wires: a packet of light
+   at the tip of the line, and a one-off ping on each milestone it reaches. */
+.exp-packet {
+  position: absolute; left: 50%; top: 0; translate: -50% -50%;
+  color: var(--neb-core); text-shadow: 0 0 6px var(--neb-glow);
+  font: 700 var(--fs-sm)/1 var(--mono); pointer-events: none;
+}
+.exp-node.is-ping { animation: node-ping 360ms var(--ease); }
+@keyframes node-ping {
+  from { box-shadow: 0 0 0 0 var(--neb-glow), 0 0 0 0 var(--accent); }
+  to { box-shadow: 0 0 0 10px transparent, 0 0 0 6px transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .exp-packet { display: none; }
+  .exp-node.is-ping { animation: none; }
 }

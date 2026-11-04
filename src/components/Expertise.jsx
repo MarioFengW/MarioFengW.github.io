@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { expertise } from '../data/content';
 import useReducedMotion from '../hooks/useReducedMotion';
+import useScrollLinked from '../hooks/useScrollLinked';
 import AsciiFlow from './AsciiFlow';
 import NebulaStage from './NebulaStage';
+import ScrambleText from './ScrambleText';
 import SectionHeading from './SectionHeading';
 
 const PIPELINE_LINE = ['data', ...expertise.map((item) => item.node)].map((node) => `[ ${node} ]`).join(' ----> ');
@@ -18,30 +20,29 @@ export default function Expertise() {
   const reducedMotion = useReducedMotion();
   const listRef = useRef(null);
 
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list || !('IntersectionObserver' in window)) return undefined;
+  const activeRef = useRef(0);
+
+  // Every scroll frame (while on screen), the step whose centre is closest to
+  // the middle of the viewport wins. Re-renders only when the winner changes.
+  const update = useCallback((list) => {
+    const mid = window.innerHeight / 2;
     const steps = [...list.querySelectorAll('.stage-step')];
-    // Whenever a step crosses the middle band, the step whose centre is closest
-    // to the middle of the screen wins (robust to fast scrolls and skipped steps).
-    const pick = () => {
-      const mid = window.innerHeight / 2;
-      let best = 0;
-      let bestDistance = Infinity;
-      steps.forEach((step, index) => {
-        const rect = step.getBoundingClientRect();
-        const distance = Math.abs(rect.top + rect.height / 2 - mid);
-        if (distance < bestDistance) {
-          bestDistance = distance;
-          best = index;
-        }
-      });
+    let best = 0;
+    let bestDistance = Infinity;
+    steps.forEach((step, index) => {
+      const rect = step.getBoundingClientRect();
+      const distance = Math.abs(rect.top + rect.height / 2 - mid);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = index;
+      }
+    });
+    if (best !== activeRef.current) {
+      activeRef.current = best;
       setActive(best);
-    };
-    const observer = new IntersectionObserver(pick, { rootMargin: '-40% 0px -40% 0px' });
-    steps.forEach((step) => observer.observe(step));
-    return () => observer.disconnect();
+    }
   }, []);
+  useScrollLinked(listRef, update);
 
   const current = expertise[active];
 
@@ -52,7 +53,8 @@ export default function Expertise() {
         <NebulaStage stage={active} playing={!reducedMotion} />
         <div className="stage-hud">
           <p className="stage-caption">
-            <span className="stage-caption-node">[ {current.node} ]</span> {current.shape}
+            {/* Decodes while the gas re-forms (same 0.7 s), replayed on each step. */}
+            <ScrambleText key={active} text={`[ ${current.node} ] ${current.shape}`} immediate />
           </p>
           <AsciiFlow className="stage-pipeline" lines={[PIPELINE_LINE]} />
         </div>

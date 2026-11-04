@@ -13,6 +13,8 @@ export default function Experience() {
   const [openIndex, setOpenIndex] = useState(0);
   const timelineRef = useRef(null);
   const progressRef = useRef(null);
+  const packetRef = useRef(null);
+  const passedRef = useRef([]);
 
   const toggle = (index) => {
     setOpenIndex((current) => (current === index ? -1 : index));
@@ -29,7 +31,19 @@ export default function Experience() {
       return node.top + node.height / 2;
     });
     progressRef.current.style.transform = `scaleY(${progress})`;
-    items.forEach((item, index) => item.toggleAttribute('data-passed', nodeCenters[index] <= reach));
+    // A packet of light rides the tip of the line; a milestone pings once as it is reached.
+    if (packetRef.current) packetRef.current.style.transform = `translateY(${reach - rect.top}px)`;
+    items.forEach((item, index) => {
+      const passed = nodeCenters[index] <= reach;
+      item.toggleAttribute('data-passed', passed);
+      if (passed && passedRef.current[index] === false) {
+        const node = item.querySelector('.exp-node');
+        node.classList.remove('is-ping');
+        void node.offsetWidth; // restart the animation if it is still running
+        node.classList.add('is-ping');
+      }
+      passedRef.current[index] = passed;
+    });
   }, []);
 
   useScrollLinked(timelineRef, update);
@@ -40,6 +54,7 @@ export default function Experience() {
       <div className="exp-timeline" ref={timelineRef}>
         <span className="exp-rail" aria-hidden="true">
           <span className="exp-progress" ref={progressRef} />
+          <span className="exp-packet" ref={packetRef}>*</span>
         </span>
         <ol className="exp-log">
           {experience.map((item, index) => {

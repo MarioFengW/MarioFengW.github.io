@@ -1,9 +1,11 @@
 // Packets of nebula light travelling along the wires of an ASCII diagram.
 // Pure functions: parse a diagram's wires once, then render any moment of it.
 
-const SPEED = 9; // cells per second
+export const FLOW_RATE = 10; // cells per second and frames per second: one cell per frame
+const SPEED = FLOW_RATE;
 const GAP = 7; // empty cells between packets on the same wire
-const TRAIL = ['+', '.']; // glyphs behind the head, nearest first
+const TRAIL = [':', '.'];
+const EPS = 1e-6; // keeps floor(t * SPEED) from landing one cell short on float error // glyphs behind the head, nearest first
 
 /**
  * Find the wires in a diagram: horizontal runs of '-' (direction from an
@@ -47,7 +49,7 @@ export function wireCells(wire, t) {
   const cells = [];
   wire.dirs.forEach((dir, packet) => {
     const shift = packet * Math.floor(period / 2);
-    const head = Math.floor(t * SPEED + seed + shift) % period;
+    const head = Math.floor(t * SPEED + seed + shift + EPS) % period;
     [head, ...TRAIL.map((_, i) => head - i - 1)].forEach((step, i) => {
       if (step < 0 || step >= length) return;
       const along = dir === 1 ? step : length - 1 - step;
@@ -63,18 +65,33 @@ export function wireCells(wire, t) {
  * One frame as three same-sized strings: the drawing with lit cells blanked
  * (`base`), and the packet trails and heads, each for its own coloured <pre>.
  */
-export function flowFrame(lines, wires, t) {
+/** Cells of a one-off packet following `path` ([{ x, y }]) that left at t0. */
+export function burstCells(path, t, t0) {
+  const step = Math.floor((t - t0) * SPEED + EPS);
+  if (step < 0 || step - TRAIL.length >= path.length) return [];
+  const cells = [];
+  [step, ...TRAIL.map((_, i) => step - i - 1)].forEach((index, i) => {
+    if (index < 0 || index >= path.length) return;
+    const { x, y } = path[index];
+    cells.push({ x, y, glyph: i === 0 ? '*' : TRAIL[i - 1], part: i === 0 ? 'head' : 'trail' });
+  });
+  return cells;
+}
+
+export function flowFrame(lines, wires, t, bursts = []) {
   const width = Math.max(0, ...lines.map((line) => line.length));
   const grid = (fill) => lines.map((line) => (fill ? line.padEnd(width, ' ') : ' '.repeat(width)).split(''));
   const base = grid(true);
   const trail = grid(false);
   const head = grid(false);
-  wires.forEach((wire) => {
-    wireCells(wire, t).forEach(({ x, y, glyph, part }) => {
-      base[y][x] = ' ';
-      (part === 'head' ? head : trail)[y][x] = glyph;
-    });
-  });
+  const light = ({ x, y, glyph, part }) => {
+    if (!base[y] || x >= width) return;
+    base[y][x] = ' ';
+    (part === 'head' ? head : trail)[y][x] = glyph;
+  };
+  wires.forEach((wire) => wireCells(wire, t).forEach(light));
+  // One-off packets are drawn last, over the ambient ones.
+  bursts.forEach(({ path, t0 }) => burstCells(path, t, t0).forEach(light));
   const join = (rows) => rows.map((row) => row.join('').replace(/\s+$/, '')).join('\n');
   return { base: join(base), trail: join(trail), head: join(head) };
 }

@@ -1,6 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 import { renderWeatherField } from '../lib/weatherField';
 import useAsciiLoop from '../hooks/useAsciiLoop';
+import { frameRates } from '../lib/motion-tokens';
 
 /**
  * The current weather as a full-bleed ASCII scene behind the About section
@@ -20,7 +21,7 @@ export default function WeatherBackdrop({ type = 'cloud', playing = true }) {
     [type]
   );
 
-  useAsciiLoop(wrapRef, preRef, draw, { playing, fps: 20 });
+  useAsciiLoop(wrapRef, preRef, draw, { playing, fps: frameRates.weather });
 
   return (
     <div ref={wrapRef} className="weather-backdrop" data-type={type} aria-hidden="true">
