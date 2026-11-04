@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { scrambleText } from '../lib/ascii';
 import useReducedMotion from '../hooks/useReducedMotion';
 
-const DURATION_MS = 700;
+const DURATION_MS = 380; // short: the page nebula already carries the motion
 const STEP_MS = 40;
 
 /**

@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { profile } from '../data/content';
-import useReducedMotion from '../hooks/useReducedMotion';
 import useNebulaFocus from '../hooks/useNebulaFocus';
-import { setPaused } from '../lib/nebulaFocus';
 import { heroGas } from '../lib/stages';
 
 /**
@@ -13,18 +11,7 @@ const HERO_FOCUS = { key: 'hero', shape: heroGas, label: '' };
 
 export default function Hero() {
   const [first, ...rest] = profile.name.split(' ');
-  const reducedMotion = useReducedMotion();
-  const [playing, setPlaying] = useState(true);
   useNebulaFocus('top', HERO_FOCUS);
-
-  useEffect(() => {
-    setPaused(!playing);
-  }, [playing]);
-
-  // Respect the OS setting by default; the visitor can still press play.
-  useEffect(() => {
-    setPlaying(!reducedMotion);
-  }, [reducedMotion]);
 
   return (
     <section className="hero" id="top">
@@ -40,6 +27,7 @@ export default function Hero() {
           <span className="caret" aria-hidden="true">_</span>
         </p>
         <p className="hero-summary">{profile.summary}</p>
+        <p className="hero-proof">{profile.proof}</p>
         <div className="hero-actions">
           <a className="btn btn-primary" href="#projects">
             <span aria-hidden="true">&gt;</span>
@@ -49,20 +37,16 @@ export default function Hero() {
             <span aria-hidden="true">&gt;</span>
             <span>email me</span>
           </a>
+          <a className="btn btn-quiet" href={profile.resume} target="_blank" rel="noopener noreferrer">
+            <span>resume.pdf</span>
+            <span aria-hidden="true">↗</span>
+          </a>
         </div>
         <p className="hero-status">
           <span className="status-dot" aria-hidden="true" />
           {profile.status}
         </p>
       </div>
-      <button
-        type="button"
-        className="hero-toggle"
-        onClick={() => setPlaying((value) => !value)}
-        aria-label={playing ? 'Pause background animation' : 'Play background animation'}
-      >
-        <span aria-hidden="true">{playing ? '[ || pause ascii ]' : '[ > play ascii ]'}</span>
-      </button>
     </section>
   );
 }

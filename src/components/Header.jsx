@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ScrollMeter from './ScrollMeter';
 import ThemeToggle from './ThemeToggle';
+import MotionToggle from './MotionToggle';
 
 export const navItems = ['about', 'expertise', 'experience', 'projects', 'contact'];
 
@@ -50,6 +51,7 @@ export default function Header() {
           <span className="caret" aria-hidden="true">_</span>
         </a>
         <ScrollMeter />
+        <MotionToggle />
         <ThemeToggle />
         <button
           type="button"

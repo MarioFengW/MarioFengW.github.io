@@ -76,7 +76,7 @@ describe('AsciiFlow', () => {
 describe('Contact wiring', () => {
   it('ends one wire at each channel link', async () => {
     const { default: Footer } = await import('./Footer');
-    const { socials } = await import('../data/content');
+    const { CHANNELS: socials } = await import('./Footer');
     mockReducedMotion(true);
     const { container, getByRole } = render(<Footer />);
     const wires = container.querySelector('.contact-wires .ascii-flow-base').textContent.split('\n');
@@ -84,5 +84,32 @@ describe('Contact wiring', () => {
     socials.forEach((link) => {
       expect(getByRole('link', { name: new RegExp(link.label) })).toHaveAttribute('href', link.href);
     });
+  });
+});
+
+describe('Contact composer', () => {
+  it('keeps the send link in sync with what the visitor writes', async () => {
+    const { default: Footer } = await import('./Footer');
+    const { fireEvent, screen } = await import('@testing-library/react');
+    mockReducedMotion(true);
+    render(<Footer />);
+    fireEvent.change(screen.getByPlaceholderText('your name'), { target: { value: 'Ana' } });
+    fireEvent.click(screen.getByLabelText(/research/));
+    fireEvent.change(screen.getByPlaceholderText('what are you working on?'), { target: { value: 'Hi' } });
+    const send = screen.getByRole('link', { name: /send/ });
+    expect(send.getAttribute('href')).toContain(encodeURIComponent('Research inquiry from Ana'));
+    expect(send.getAttribute('href')).toContain('body=Hi');
+  });
+
+  it('copies the address and says so', async () => {
+    const { default: Footer } = await import('./Footer');
+    const { fireEvent, screen, findByText } = await import('@testing-library/react');
+    mockReducedMotion(true);
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { ...navigator, clipboard: { writeText } });
+    render(<Footer />);
+    fireEvent.click(screen.getByRole('button', { name: /copy/ }));
+    expect(await screen.findByText('[ copied ]')).toBeInTheDocument();
+    expect(writeText).toHaveBeenCalledWith('mario.fengw@gmail.com');
   });
 });
