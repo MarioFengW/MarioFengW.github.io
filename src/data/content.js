@@ -16,14 +16,6 @@ export const facts = [
   { key: 'offline', value: 'gaming · reading · music' },
 ];
 
-// Impact numbers shown as animated counters. Each one is backed by an entry below.
-export const highlights = [
-  { value: 89.46, decimals: 2, suffix: '%', label: 'F1 score · traffic classifier' },
-  { value: 45000, suffix: '+', label: 'contacts reached · AI campaigns' },
-  { value: 3000, suffix: '+', label: 'schools · Connect the Schools' },
-  { value: 90, suffix: '%', label: 'defect detection · Mask R-CNN' },
-];
-
 // Fixed location for the live ASCII weather widget (no geolocation prompt).
 export const currentCity = {
   name: 'Taipei',
@@ -69,6 +61,7 @@ export const experience = [
     location: 'Hybrid',
     link: 'https://nextgenscientist.mx/',
     linkLabel: 'nextgenscientist.mx',
+    metric: '89.46% F1',
     description: 'MultiView Stacking model for network traffic classification, beating the single-model baseline by 0.9 points (89.46% vs 88.55% F1). Working toward a Q1/Q2 journal submission.',
     stack: ['Python', 'Scikit-learn', 'Random Forest', 'SMOTE'],
   },
@@ -79,6 +72,7 @@ export const experience = [
     location: 'Hybrid',
     link: 'https://www.amco.me/',
     linkLabel: 'amco.me',
+    metric: '45,000+ contacts',
     description: 'Scaled a document automation pipeline across 10 recurring client events, plus AI-assisted content and email campaigns reaching 45,000+ contacts.',
     stack: ['Make.com', 'ChatGPT', 'Mailchimp'],
   },
@@ -89,6 +83,7 @@ export const experience = [
     location: 'Remote',
     link: 'https://industriasrochin.com/en/',
     linkLabel: 'industriasrochin.com',
+    metric: '90% detection',
     description: 'Real-time defect detection for fresh tomatoes using Mask R-CNN, reaching a 90% detection rate in quality control tests.',
     stack: ['Python', 'Mask R-CNN', 'Google Colab'],
   },
@@ -115,6 +110,7 @@ export const projects = [
     title: 'Connect the Schools',
     period: 'Feb 2025 - Jun 2025',
     context: 'Software Construction',
+    metric: '3,000+ schools',
     description: 'Educational support platform connecting 3,000+ schools with partners through similarity-based needs matching.',
     stack: ['React', 'Node.js', 'PostgreSQL'],
     link: 'https://github.com/JRV-XVI/connect-the-schools'

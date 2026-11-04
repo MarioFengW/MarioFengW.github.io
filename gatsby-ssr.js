@@ -3,16 +3,17 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
 import '@fontsource/jetbrains-mono/700.css';
 import './src/styles/global.css';
+import { THEME_SCRIPT } from './src/lib/theme';
 
-// Scroll-reveal elements are server-rendered at opacity 0 and animated in by JS.
-// Without JS, show them as-is. (Set here, not in Head, so the <style> isn't escaped.)
 // Not exported: gatsby-ssr.js may only export Gatsby API names (else error #11329).
-const NO_JS_CSS =
-  '[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important}.boot{display:none!important}';
+// Content is visible by default; only the boot overlay needs hiding without JS.
+const NO_JS_CSS = '.boot{display:none!important}';
 
 export const onRenderBody = ({ setHtmlAttributes, setHeadComponents }) => {
   setHtmlAttributes({ lang: 'en' });
   setHeadComponents([
-    <noscript key="no-js-reveal" dangerouslySetInnerHTML={{ __html: `<style>${NO_JS_CSS}</style>` }} />,
+    // Runs before first paint: picks the saved / OS theme so there is no flash.
+    <script key="theme" dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />,
+    <noscript key="no-js" dangerouslySetInnerHTML={{ __html: `<style>${NO_JS_CSS}</style>` }} />,
   ]);
 };

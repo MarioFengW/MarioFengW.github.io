@@ -1,45 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { m } from 'motion/react';
 import { profile } from '../data/content';
-import { motionTokens, springs } from '../lib/motion-tokens';
-import { useRiseVariants } from './Reveal';
-import { useBooted } from './BootScreen';
 import useReducedMotion from '../hooks/useReducedMotion';
 import AsciiField from './AsciiField';
 import SocialLinks from './SocialLinks';
 
-const COMMAND = 'whoami';
-
-// Typewriter: characters appear one by one, then the rest of the hero rises in.
-const typeVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: motionTokens.stagger.type } },
-};
-const charVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0 } },
-};
-// The rest of the hero waits for `whoami` to finish typing — unless the visitor
-// asked for reduced motion, in which case nothing should hold content back.
-export function getIntroVariants(reducedMotion) {
-  return {
-    hidden: {},
-    visible: {
-      transition: {
-        delayChildren: reducedMotion ? 0 : COMMAND.length * motionTokens.stagger.type + motionTokens.duration.fast,
-        staggerChildren: reducedMotion ? 0 : motionTokens.stagger.list,
-      },
-    },
-  };
-}
-const tap = { scale: motionTokens.scale.press };
-
+/**
+ * Hero. Content is visible in the default state (no script-dependent hiding):
+ * the boot screen dissolving over it is the page's one entrance moment.
+ */
 export default function Hero() {
   const [first, ...rest] = profile.name.split(' ');
   const reducedMotion = useReducedMotion();
-  const rise = useRiseVariants();
-  // The intro waits for the boot screen, so it plays where the visitor can see it.
-  const intro = useBooted() ? 'visible' : 'hidden';
   const [playing, setPlaying] = useState(true);
 
   // Respect the OS setting by default; the visitor can still press play.
@@ -50,43 +21,34 @@ export default function Hero() {
   return (
     <section className="hero" id="top">
       <AsciiField className="hero-field" playing={playing} />
-      <m.div className="hero-content" initial="hidden" animate={intro} variants={getIntroVariants(reducedMotion)}>
-        <p className="prompt">
-          <span className="prompt-sign" aria-hidden="true">$</span>{' '}
-          <span className="sr-only">{COMMAND}</span>
-          <m.span variants={typeVariants} initial="hidden" animate={intro} aria-hidden="true">
-            {COMMAND.split('').map((char, index) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <m.span key={index} variants={charVariants} data-reveal="">{char}</m.span>
-            ))}
-          </m.span>
-          <span className="caret" aria-hidden="true">_</span>
-        </p>
+      <div className="hero-content">
         <h1>
           {first}
           <br />
           {rest.join(' ')}
         </h1>
-        <m.p className="hero-role" variants={rise} data-reveal="">{profile.role}</m.p>
-        <m.p className="hero-summary" variants={rise} data-reveal="">{profile.summary}</m.p>
-        <m.div className="hero-actions" variants={rise} data-reveal="">
-          <m.a className="btn btn-primary" href="#projects" whileTap={tap} transition={springs.snappy}>
+        <p className="hero-role">
+          <span className="prompt-sign" aria-hidden="true">&gt; </span>
+          {profile.role}
+          <span className="caret" aria-hidden="true">_</span>
+        </p>
+        <p className="hero-summary">{profile.summary}</p>
+        <div className="hero-actions">
+          <a className="btn btn-primary" href="#projects">
             <span aria-hidden="true">&gt;</span>
             <span>view projects</span>
-          </m.a>
-          <m.a className="btn" href={`mailto:${profile.email}`} whileTap={tap} transition={springs.snappy}>
+          </a>
+          <a className="btn" href={`mailto:${profile.email}`}>
             <span aria-hidden="true">&gt;</span>
             <span>email me</span>
-          </m.a>
-        </m.div>
-        <m.p className="hero-status" variants={rise} data-reveal="">
+          </a>
+        </div>
+        <p className="hero-status">
           <span className="status-dot" aria-hidden="true" />
           {profile.status}
-        </m.p>
-        <m.div variants={rise} data-reveal="">
-          <SocialLinks primaryOnly className="hero-socials" />
-        </m.div>
-      </m.div>
+        </p>
+        <SocialLinks primaryOnly className="hero-socials" />
+      </div>
       <button
         type="button"
         className="hero-toggle"

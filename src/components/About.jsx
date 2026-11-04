@@ -5,8 +5,6 @@ import useReducedMotion from '../hooks/useReducedMotion';
 import SectionHeading from './SectionHeading';
 import WeatherBackdrop from './WeatherBackdrop';
 import WeatherStatus from './WeatherStatus';
-import Highlights from './Highlights';
-import { Reveal, RevealItem, RevealList } from './Reveal';
 
 export default function About({ fetchImpl }) {
   const { weather, status, localTime } = useWeather(currentCity, fetchImpl);
@@ -18,24 +16,21 @@ export default function About({ fetchImpl }) {
     <section className="about" id="about">
       <WeatherBackdrop key={type} type={type} playing={!reducedMotion} />
       <div className="about-inner">
-        <SectionHeading index="01" kicker="about" title="Hello, world" />
+        <SectionHeading title="Hello, world" />
         <div className="about-grid">
           <div className="about-copy">
-            <Reveal as="p" className="about-intro">{profile.intro}</Reveal>
-            <RevealList as="dl" className="facts">
+            <p className="about-intro">{profile.intro}</p>
+            <dl className="facts">
               {facts.map((fact) => (
-                <RevealItem as="div" key={fact.key}>
+                <div key={fact.key}>
                   <dt>{fact.key}</dt>
                   <dd>{fact.value}</dd>
-                </RevealItem>
+                </div>
               ))}
-            </RevealList>
+            </dl>
           </div>
-          <Reveal>
-            <WeatherStatus city={currentCity} weather={weather} status={status} localTime={localTime} />
-          </Reveal>
+          <WeatherStatus city={currentCity} weather={weather} status={status} localTime={localTime} />
         </div>
-        <Highlights />
       </div>
     </section>
   );
