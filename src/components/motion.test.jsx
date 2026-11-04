@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import ScrollMeter, { scrollProgress } from './ScrollMeter';
 import Hero from './Hero';
 import MotionToggle from './MotionToggle';
@@ -76,8 +76,9 @@ describe('ScrollMeter', () => {
     window.dispatchEvent(new Event('scroll'));
     window.dispatchEvent(new Event('scroll'));
     expect(raf.pending()).toBe(1);
-    raf.step(16);
-    expect(meter.textContent).toBe(asciiProgress(0.5));
+    act(() => raf.step(16));
+    expect(meter.textContent).toContain(' 50%');
+    expect(meter.querySelector('.nebula-bar-head').textContent).toBe('@');
     window.dispatchEvent(new Event('resize'));
     unmount();
     expect(raf.pending()).toBe(0);

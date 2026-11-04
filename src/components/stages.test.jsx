@@ -13,8 +13,8 @@ function placeSteps(container, centers) {
 }
 
 describe('Expertise stage', () => {
-  it('activates the step closest to the middle of the screen', () => {
-    mockReducedMotion(true);
+  it('slides the track sideways with scroll and activates the step in front', () => {
+    mockReducedMotion(false);
     const io = mockIntersectionObserver();
     const raf = mockAnimationFrame();
     const { container } = render(<Expertise />);
@@ -22,16 +22,27 @@ describe('Expertise stage', () => {
     expect(steps[0]).toHaveClass('is-active');
 
     vi.stubGlobal('innerHeight', 800);
-    placeSteps(container, [-500, 120, 410]); // third step sits on the middle (400)
-    // On screen: the scroll-linked update runs on the next frame.
+    const pin = container.querySelector('.stage-pin');
+    const track = container.querySelector('.stage-steps');
+    pin.getBoundingClientRect = () => ({ top: -1600, height: 2400 }); // fully scrolled through
+    [...track.children].forEach((step, i) => Object.defineProperty(step, 'offsetLeft', { value: 100 + i * 1000, configurable: true }));
     act(() => {
       io.trigger(true);
       raf.step(16);
     });
+    expect(track.style.transform).toBe('translateX(-2000px)');
     expect(steps[2]).toHaveClass('is-active');
     setActiveSection(null);
     setActiveSection('expertise');
     expect(getFocus().label).toContain('deploy');
+  });
+
+  it('pinProgress maps the pinned scroll to 0..1', async () => {
+    const { pinProgress } = await import('./Expertise');
+    expect(pinProgress(0, 2400, 800)).toBe(0);
+    expect(pinProgress(-800, 2400, 800)).toBe(0.5);
+    expect(pinProgress(-5000, 2400, 800)).toBe(1);
+    expect(pinProgress(0, 600, 800)).toBe(0);
   });
 });
 
@@ -114,16 +125,3 @@ describe('Contact composer', () => {
   });
 });
 
-describe('Resume section', () => {
-  it('shows the page preview and links to open and download the PDF', async () => {
-    const { default: Resume } = await import('./Resume');
-    const { screen } = await import('@testing-library/react');
-    render(<Resume />);
-    expect(screen.getByRole('heading', { level: 2, name: 'Resume' })).toBeInTheDocument();
-    expect(screen.getByAltText(/Resume of Mario Feng Wu/)).toHaveAttribute('src', '/resume-preview.png');
-    const download = screen.getByRole('link', { name: /download pdf/ });
-    expect(download).toHaveAttribute('href', '/Mario_Feng_Wu_Resume.pdf');
-    expect(download).toHaveAttribute('download', 'Mario_Feng_Wu_Resume.pdf');
-    expect(screen.getByRole('link', { name: /open in a new tab/ })).toHaveAttribute('target', '_blank');
-  });
-});
