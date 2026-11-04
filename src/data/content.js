@@ -26,10 +26,10 @@ export const currentCity = {
 
 // `primary` links appear in the hero; all of them appear in the contact footer.
 export const socials = [
-  { label: 'email', href: 'mailto:mario.fengw@gmail.com', primary: true },
-  { label: 'github', href: 'https://github.com/MarioFengW', primary: true },
-  { label: 'linkedin', href: 'https://www.linkedin.com/in/mariofengwu/', primary: true },
-  { label: 'discord', href: 'https://discord.com/users/1162141976813117490' },
+  { label: 'email', href: 'mailto:mario.fengw@gmail.com', handle: 'mario.fengw@gmail.com', primary: true },
+  { label: 'github', href: 'https://github.com/MarioFengW', handle: 'MarioFengW', primary: true },
+  { label: 'linkedin', href: 'https://www.linkedin.com/in/mariofengwu/', handle: 'mariofengwu', primary: true },
+  { label: 'discord', href: 'https://discord.com/users/1162141976813117490', handle: 'say hi' },
 ];
 
 export const expertise = [

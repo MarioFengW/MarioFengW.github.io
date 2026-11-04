@@ -65,8 +65,8 @@ export function containers(cols, rows, t) {
     if (lx < inset || lx > 1 - inset || ly < inset * 1.6 || ly > 1 - inset * 1.6) return 0.04;
     const edge = lx < inset + 0.05 || lx > 0.95 - inset || ly < inset * 1.6 + 0.1 || ly > 0.9 - inset * 1.6;
     const lit = gy * GRID.cols + gx < up;
-    if (edge) return 1.5;
-    return lit ? 1.3 : 0.12;
+    if (edge) return 1.25;
+    return lit ? 1.15 : 0.1;
   };
 }
 

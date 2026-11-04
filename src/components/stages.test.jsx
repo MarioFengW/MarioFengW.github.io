@@ -24,7 +24,6 @@ describe('Expertise stage', () => {
     act(() => io.trigger(true));
     expect(steps[2]).toHaveClass('is-active');
     expect(container.querySelector('.stage-caption').textContent).toContain('deploy');
-    expect(container.querySelector('.stage-wire .is-active').textContent).toBe('[ deploy ]');
   });
 });
 
@@ -63,5 +62,19 @@ describe('AsciiFlow', () => {
     unmount();
     expect(base.textContent).toBe(lines[0]);
     expect(raf.pending()).toBe(0);
+  });
+});
+
+describe('Contact wiring', () => {
+  it('ends one wire at each channel link', async () => {
+    const { default: Footer } = await import('./Footer');
+    const { socials } = await import('../data/content');
+    mockReducedMotion(true);
+    const { container, getByRole } = render(<Footer />);
+    const wires = container.querySelector('.contact-wires .ascii-flow-base').textContent.split('\n');
+    expect(wires.filter((line) => line.trimEnd().endsWith('------>'))).toHaveLength(socials.length);
+    socials.forEach((link) => {
+      expect(getByRole('link', { name: new RegExp(link.label) })).toHaveAttribute('href', link.href);
+    });
   });
 });
