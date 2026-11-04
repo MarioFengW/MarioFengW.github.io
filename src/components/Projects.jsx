@@ -64,6 +64,9 @@ export default function Projects() {
                     <p className="project-context">{project.context}</p>
                     <h3 className="project-title" id={`project-${slug}`}>{project.title}</h3>
                     {project.metric && <p className="project-metric">{project.metric}</p>}
+                    {project.diagram && (
+                      <pre className="project-diagram" aria-hidden="true">{project.diagram.join('\n')}</pre>
+                    )}
                   </div>
                   <div className="project-detail">
                     <p className="project-desc">{project.description}</p>

@@ -317,13 +317,55 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 /* Rows, like `ls -l`: what · why · with what. */
 .expertise-list { border-top: 1px solid var(--line-strong); }
 .expertise-row {
-  display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) minmax(0, 13rem);
+  display: grid; grid-template-columns: 11ch minmax(0, 14rem) minmax(0, 1fr) minmax(0, 13rem);
   gap: 8px 40px; align-items: baseline;
   padding: 26px 0; border-bottom: 1px solid var(--line);
 }
 .expertise-title { font-size: var(--fs-lg); font-weight: 700; line-height: 1.35; }
 .expertise-desc { max-width: 54ch; color: var(--ink-dim); font-size: var(--fs-sm); }
 .expertise-stack { color: var(--accent); font-size: var(--fs-xs); text-align: right; }
+
+/* The pipeline those rows belong to: data -> model -> app -> deploy, with one
+   packet travelling the wire. Constant motion, so linear and stepped per cell. */
+.pipeline { position: relative; margin-bottom: 28px; overflow-x: auto; color: var(--ink-faint); font-size: var(--fs-sm); }
+.pipeline-wire { margin: 0; font: inherit; line-height: 1.6; white-space: pre; }
+.pipeline-packet {
+  position: absolute; top: 0; left: 0; width: 1ch; line-height: 1.6;
+  color: var(--accent); pointer-events: none;
+  animation: packet 5.5s steps(55, end) infinite;
+}
+.pipeline-packet::before { content: '>'; }
+@keyframes packet { from { transform: translateX(0); } to { transform: translateX(55ch); } }
+.expertise-node { color: var(--accent); font-size: var(--fs-xs); white-space: nowrap; }
+
+/* --------------------------------------------------------------- now --- */
+/* A terminal session: status bar, `ls -l`, running processes. */
+.now-term { display: grid; gap: 10px; max-width: 72ch; font-size: var(--fs-sm); }
+.now-line { margin: 0; }
+.now-cmd { margin-top: 18px; color: var(--ink); }
+.now-cmd:first-child { margin-top: 0; }
+.now-prompt { color: var(--accent); }
+.now-arg { color: var(--ink-dim); }
+.now-place { color: var(--ink-dim); }
+.now-bar { color: var(--signal); white-space: pre; overflow-x: auto; font-variant-numeric: tabular-nums; }
+.now-courses li { display: grid; grid-template-columns: 11ch 7ch minmax(0, 1fr); gap: 16px; padding: 4px 0; }
+.now-perm { color: var(--ink-faint); }
+.now-code { color: var(--accent); }
+.now-title { color: var(--ink); }
+.now-building li { padding: 4px 0; color: var(--ink); }
+.now-run { color: var(--ok); }
+
+/* -------------------------------------------------- project diagrams --- */
+.project-diagram {
+  margin: 22px 0 0; color: var(--ink-faint); font: var(--fs-xs)/1.5 var(--mono);
+  white-space: pre; overflow-x: auto;
+}
+
+/* ----------------------------------------------------------- skyline --- */
+.skyline {
+  margin: 48px 0 0; color: var(--line-strong); font: clamp(.5rem, 1.6vw, .8rem)/1.15 var(--mono);
+  white-space: pre; overflow: hidden;
+}
 
 /* --------------------------------------------------------- experience --- */
 /* Timeline: the rail fills with scroll; milestones light up when reached. */
@@ -529,7 +571,8 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
    keep colour/opacity feedback and state changes. */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .caret { animation: none; }
+  .caret, .pipeline-packet { animation: none; }
+  .pipeline-packet { display: none; }
   .btn:active, .socials a:active, .nav-toggle:active, .theme-toggle:active, .project-cta:active { transform: none; }
   .links, .links.is-open, .links li, .links.is-open li { transform: none; transition-delay: 0s; }
   .page-transition { display: none; }
@@ -583,3 +626,11 @@ html[data-booted] .boot { display: none; }
 @media (pointer: coarse) {
   .socials a { min-height: 44px; }
 }
+
+@media (max-width: 560px) {
+  .now-courses li { grid-template-columns: 7ch minmax(0, 1fr); }
+  .now-perm { display: none; }
+}
+
+/* Diagrams are drawn cell by cell: no ligatures, or "-->" collapses into one glyph. */
+.pipeline, .project-diagram, .skyline, .now-term { font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }

@@ -9,6 +9,7 @@ import Footer from '../components/Footer';
 import PageTransition from '../components/PageTransition';
 import BootScreen from '../components/BootScreen';
 import SectionDivider from '../components/SectionDivider';
+import Now from '../components/Now';
 
 export default function HomePage() {
   return (
@@ -23,6 +24,7 @@ export default function HomePage() {
           <About />
           <Expertise />
           <Experience />
+          <Now />
           <SectionDivider label=">> projects" />
           <Projects />
           <SectionDivider label=">> contact" />
