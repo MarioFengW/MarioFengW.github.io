@@ -99,13 +99,14 @@ describe('About', () => {
 });
 
 describe('Expertise', () => {
-  it('lists every area as a row with what and stack', () => {
+  it('lists every area as a step with what, evidence and stack', () => {
     const { container } = render(<Expertise />);
-    expect(container.querySelectorAll('.expertise-row')).toHaveLength(expertise.length);
+    expect(container.querySelectorAll('.stage-step')).toHaveLength(expertise.length);
     expertise.forEach((item) => {
       expect(screen.getByRole('heading', { level: 3, name: item.title })).toBeInTheDocument();
       expect(screen.getByText(item.description)).toBeInTheDocument();
       expect(screen.getByText(item.tag)).toBeInTheDocument();
+      item.evidence.forEach((line) => expect(screen.getByText(line)).toBeInTheDocument());
     });
   });
 });

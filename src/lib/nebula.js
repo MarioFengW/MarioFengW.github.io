@@ -113,11 +113,17 @@ export function classifyCell({ density, hue, star }, ramp = RAMP) {
   return { layer: hue > 0.5 ? 2 : 1, char };
 }
 
+/** Density after shaping by multiplier `m`: scaled, plus a lift where m > 0.9. */
+export function sculpt(density, m) {
+  return density * m + 0.55 * Math.max(0, m - 0.9);
+}
+
 /**
  * Render one frame as one string per layer (same dimensions, spaces elsewhere),
- * so each layer can be a stacked <pre> with its own colour.
+ * so each layer can be a stacked <pre> with its own colour. An optional
+ * `shape(x, y)` multiplies the density, letting the same gas take a form.
  */
-export function renderNebulaLayers(cols, rows, t, pointer = null) {
+export function renderNebulaLayers(cols, rows, t, pointer = null, shape = null) {
   const count = NEBULA_LAYERS.length;
   if (cols <= 0 || rows <= 0) return new Array(count).fill('');
   const rowsOut = Array.from({ length: count }, () => new Array(rows));
@@ -125,7 +131,10 @@ export function renderNebulaLayers(cols, rows, t, pointer = null) {
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
       for (let l = 0; l < count; l++) line[l][x] = ' ';
-      const cell = classifyCell(nebulaSample(x, y, t, pointer));
+      const sample = nebulaSample(x, y, t, pointer);
+      // `shape` sculpts the gas: a 0..~1.5 multiplier per cell (stars stay put).
+      // Above ~1 it also adds gas, so a form shows even where the noise is thin.
+      const cell = classifyCell(shape ? { ...sample, density: sculpt(sample.density, shape(x, y)) } : sample);
       if (cell) line[cell.layer][x] = cell.char;
     }
     for (let l = 0; l < count; l++) rowsOut[l][y] = line[l].join('');

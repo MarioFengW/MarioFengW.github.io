@@ -3,6 +3,7 @@ import { projects } from '../data/content';
 import { stackCover, stackDepth } from '../lib/scrollMath';
 import useScrollLinked from '../hooks/useScrollLinked';
 import useReducedMotion from '../hooks/useReducedMotion';
+import AsciiFlow from './AsciiFlow';
 import SectionHeading from './SectionHeading';
 
 export function slugify(title) {
@@ -64,9 +65,7 @@ export default function Projects() {
                     <p className="project-context">{project.context}</p>
                     <h3 className="project-title" id={`project-${slug}`}>{project.title}</h3>
                     {project.metric && <p className="project-metric">{project.metric}</p>}
-                    {project.diagram && (
-                      <pre className="project-diagram" aria-hidden="true">{project.diagram.join('\n')}</pre>
-                    )}
+                    {project.diagram && <AsciiFlow lines={project.diagram} />}
                   </div>
                   <div className="project-detail">
                     <p className="project-desc">{project.description}</p>
