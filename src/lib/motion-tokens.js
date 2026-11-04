@@ -4,8 +4,10 @@
 
 export const motionTokens = {
   duration: {
-    fast: 0.18, // feedback, page-wipe cover
-    normal: 0.3, // page-wipe reveal, boot dissolve
+    fast: 0.18, // feedback
+    normal: 0.3, // boot dissolve
+    wipeCover: 0.08, // page-wipe cover
+    wipeReveal: 0.12, // page-wipe reveal
   },
 };
 

@@ -15,6 +15,17 @@ const LINE_MS = 80;
 const BAR_MS = 280;
 const HOLD_MS = 60;
 const BAR_START_MS = (BOOT_LINES.length - 1) * LINE_MS;
+// Seen once per browser session; later loads go straight to the page.
+export const BOOT_SEEN_KEY = 'boot-seen';
+
+function readSeen() {
+  try { return window.sessionStorage.getItem(BOOT_SEEN_KEY) === '1'; } catch { return false; }
+}
+
+function markSeen() {
+  try { window.sessionStorage.setItem(BOOT_SEEN_KEY, '1'); } catch { /* storage blocked: boot plays again */ }
+}
+
 export const BOOT_LOG_MS = BAR_START_MS + BAR_MS + HOLD_MS;
 const REVEAL_MS = motionTokens.duration.normal * 1000;
 
@@ -27,7 +38,7 @@ export function bootLog(elapsed) {
 }
 
 /**
- * Full-screen terminal boot on every load: the log types out, then dissolves in
+ * Full-screen terminal boot on the first load of a session: the log types out, then dissolves in
  * an ASCII wipe to reveal the page. Click or press any key to skip.
  * Server-rendered so it covers the page from the first paint.
  */
@@ -59,7 +70,7 @@ export default function BootScreen({ onDone }) {
       setDone(true);
     };
 
-    if (reducedMotion) {
+    if (reducedMotion || readSeen()) {
       finish();
       return undefined;
     }
@@ -95,6 +106,7 @@ export default function BootScreen({ onDone }) {
     };
     window.addEventListener('keydown', skip);
     window.addEventListener('pointerdown', skip);
+    markSeen();
     rafId = requestAnimationFrame(frame);
 
     return () => {
