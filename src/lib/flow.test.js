@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findWires, flowFrame, wireCells } from './flow';
+import { findWires, flowFrame, FLOW_RATE, wireCells } from './flow';
 
 describe('findWires', () => {
   it('reads direction from arrowheads', () => {
@@ -27,7 +27,7 @@ describe('wireCells', () => {
   it('moves the packet head forward over time', () => {
     const head = (t) => wireCells(wire, t).find((c) => c.part === 'head');
     const a = head(0);
-    const b = head(1 / 9); // one cell later at 9 cells per second
+    const b = head(1 / FLOW_RATE); // one cell later at 9 cells per second
     expect(b.x - a.x).toBe(1);
   });
 
@@ -41,7 +41,7 @@ describe('wireCells', () => {
   it('runs backwards for reverse wires', () => {
     const back = { ...wire, dirs: [-1] };
     const head = (t) => wireCells(back, t).find((c) => c.part === 'head');
-    expect(head(1 / 9).x - head(0).x).toBe(-1);
+    expect(head(1 / FLOW_RATE).x - head(0).x).toBe(-1);
   });
 
   it('moves down vertical wires', () => {

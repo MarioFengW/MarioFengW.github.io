@@ -1,6 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 import { NEBULA_LAYERS, renderNebulaLayers } from '../lib/nebula';
 import useAsciiLoop from '../hooks/useAsciiLoop';
+import { frameRates } from '../lib/motion-tokens';
 
 /**
  * Animated ASCII nebula: drifting gas in four colour layers (dust, blue, rose,
@@ -20,7 +21,7 @@ export default function AsciiField({ className = '', playing = true }) {
     });
   }, []);
 
-  useAsciiLoop(wrapRef, probeRef, draw, { playing, fps: 24, trackPointer: true });
+  useAsciiLoop(wrapRef, probeRef, draw, { playing, fps: frameRates.hero, trackPointer: true });
 
   return (
     <div ref={wrapRef} className={`ascii-field ${className}`.trim()} aria-hidden="true">

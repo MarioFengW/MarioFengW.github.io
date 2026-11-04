@@ -2,6 +2,9 @@
 // --ease and literal durations). No animation library: every effect is CSS,
 // a View Transition, or a small requestAnimationFrame loop.
 
+// Frame rates for the ASCII loops: the hero draws the eye, background fields drift.
+export const frameRates = { hero: 24, weather: 20, field: 14, morph: 24 };
+
 export const motionTokens = {
   duration: {
     fast: 0.18, // feedback

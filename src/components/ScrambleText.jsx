@@ -6,17 +6,18 @@ const DURATION_MS = 700;
 const STEP_MS = 40;
 
 /**
- * Text that "decodes" from random glyphs the first time it scrolls into view.
+ * Text that "decodes" from random glyphs the first time it scrolls into view
+ * (or on mount with `immediate`).
  * Screen readers always get the real text; the animated copy is aria-hidden.
  * Server-rendered output is the final text, so no-JS visitors see it normally.
  */
-export default function ScrambleText({ text, as: Tag = 'span', className }) {
+export default function ScrambleText({ text, as: Tag = 'span', className, immediate = false }) {
   const visualRef = useRef(null);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const node = visualRef.current;
-    if (!node || reducedMotion || !('IntersectionObserver' in window)) return undefined;
+    if (!node || reducedMotion) return undefined;
 
     let rafId = 0;
     let started = false;
@@ -39,6 +40,16 @@ export default function ScrambleText({ text, as: Tag = 'span', className }) {
       rafId = requestAnimationFrame(frame);
     }
 
+    // `immediate`: play on mount (for text that changes in place) instead of on first view.
+    if (immediate) {
+      run();
+      return () => {
+        cancelAnimationFrame(rafId);
+        node.textContent = text;
+      };
+    }
+    if (!('IntersectionObserver' in window)) return undefined;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !started) {
@@ -56,7 +67,7 @@ export default function ScrambleText({ text, as: Tag = 'span', className }) {
       cancelAnimationFrame(rafId);
       node.textContent = text;
     };
-  }, [text, reducedMotion]);
+  }, [text, reducedMotion, immediate]);
 
   return (
     <Tag className={className}>

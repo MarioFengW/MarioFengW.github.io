@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { projects } from '../data/content';
 import { stackCover, stackDepth } from '../lib/scrollMath';
 import useScrollLinked from '../hooks/useScrollLinked';
@@ -20,7 +20,13 @@ export function ctaLabel(link) {
  * slides over it; the covered card recedes (shrinks, dims) in step with the
  * scroll. Under reduced motion the stack stays, without the depth effect.
  */
+function finePointer() {
+  return typeof window.matchMedia === 'function' && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+}
+
 export default function Projects() {
+  // The hovered card's diagram runs at double speed (fine pointers only).
+  const [hovered, setHovered] = useState(null);
   const stackRef = useRef(null);
   const reducedMotion = useReducedMotion();
 
@@ -51,7 +57,12 @@ export default function Projects() {
           const slug = slugify(project.title);
           return (
             <li className="project-card" key={project.title} style={{ '--i': index }}>
-              <article className="project-inner" aria-labelledby={`project-${slug}`}>
+              <article
+                className="project-inner"
+                aria-labelledby={`project-${slug}`}
+                onPointerEnter={() => finePointer() && setHovered(project.title)}
+                onPointerLeave={() => setHovered(null)}
+              >
                 <span className="project-shade" aria-hidden="true" />
                 <header className="project-top">
                   <span className="project-count">
@@ -65,7 +76,7 @@ export default function Projects() {
                     <p className="project-context">{project.context}</p>
                     <h3 className="project-title" id={`project-${slug}`}>{project.title}</h3>
                     {project.metric && <p className="project-metric">{project.metric}</p>}
-                    {project.diagram && <AsciiFlow lines={project.diagram} />}
+                    {project.diagram && <AsciiFlow lines={project.diagram} fast={hovered === project.title} />}
                   </div>
                   <div className="project-detail">
                     <p className="project-desc">{project.description}</p>

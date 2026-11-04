@@ -15,13 +15,18 @@ describe('Expertise stage', () => {
   it('activates the step closest to the middle of the screen', () => {
     mockReducedMotion(true);
     const io = mockIntersectionObserver();
+    const raf = mockAnimationFrame();
     const { container } = render(<Expertise />);
     const steps = container.querySelectorAll('.stage-step');
     expect(steps[0]).toHaveClass('is-active');
 
     vi.stubGlobal('innerHeight', 800);
     placeSteps(container, [-500, 120, 410]); // third step sits on the middle (400)
-    act(() => io.trigger(true));
+    // On screen: the scroll-linked update runs on the next frame.
+    act(() => {
+      io.trigger(true);
+      raf.step(16);
+    });
     expect(steps[2]).toHaveClass('is-active');
     expect(container.querySelector('.stage-caption').textContent).toContain('deploy');
   });
