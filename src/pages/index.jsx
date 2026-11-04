@@ -6,6 +6,7 @@ import Expertise from '../components/Expertise';
 import Experience from '../components/Experience';
 import Projects from '../components/Projects';
 import Footer from '../components/Footer';
+import Resume from '../components/Resume';
 import PageTransition from '../components/PageTransition';
 import BootScreen from '../components/BootScreen';
 import PageNebula from '../components/PageNebula';
@@ -25,6 +26,7 @@ export default function HomePage() {
           <Expertise />
           <Experience />
           <Projects />
+          <Resume />
           <Footer />
         </div>
       </main>

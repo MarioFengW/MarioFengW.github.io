@@ -3,7 +3,7 @@ import ScrollMeter from './ScrollMeter';
 import ThemeToggle from './ThemeToggle';
 import MotionToggle from './MotionToggle';
 
-export const navItems = ['about', 'expertise', 'experience', 'projects', 'contact'];
+export const navItems = ['about', 'expertise', 'experience', 'projects', 'resume', 'contact'];
 
 /** Tracks which section is in the reading zone (a band just under the header). */
 export function useActiveSection(ids) {

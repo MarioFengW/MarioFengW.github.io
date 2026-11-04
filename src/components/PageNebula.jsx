@@ -66,6 +66,9 @@ export default function PageNebula() {
       if (!rafId) rafId = requestAnimationFrame(check);
     };
     check();
+    // Sections register in their own effects, after this one: check again on the
+    // next frame so the first screen gets its shape without waiting for a scroll.
+    schedule();
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
     return () => {

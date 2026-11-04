@@ -719,3 +719,27 @@ main { position: relative; z-index: 1; }
 .weather-status { border: 0; background: var(--bg-raised); }
 .project-context { margin-top: 10px; }
 .section-head { margin-bottom: 40px; }
+
+/* ------------------------------------------------------------ resume --- */
+/* The resume as a sheet lying in the nebula: the page preview on the left,
+   what it is and how to get it on the right. */
+.section-head h2, .contact-title { display: inline-block; }
+.resume-body {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 32px clamp(32px, 6vw, 80px); align-items: start;
+}
+.resume-sheet {
+  display: block; background: #fff; box-shadow: 0 24px 60px -24px rgba(0, 0, 0, .7);
+  transition: transform var(--dur-state) var(--ease);
+}
+.resume-sheet img { display: block; width: 100%; height: auto; }
+@media (hover: hover) and (pointer: fine) { .resume-sheet:hover { transform: translateY(-4px); } }
+.resume-sheet:active { transform: scale(.99); }
+.resume-side { display: grid; gap: 20px; align-content: start; position: sticky; top: calc(var(--nav-h) + 32px); }
+.resume-note { max-width: 40ch; font-size: var(--fs-base); }
+.resume-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.resume-meta { color: var(--ink-faint); font-size: var(--fs-xs); }
+@media (max-width: 860px) {
+  .resume-body { grid-template-columns: 1fr; }
+  .resume-side { position: static; order: -1; }
+}
