@@ -113,3 +113,17 @@ describe('Contact composer', () => {
     expect(writeText).toHaveBeenCalledWith('mario.fengw@gmail.com');
   });
 });
+
+describe('Resume section', () => {
+  it('shows the page preview and links to open and download the PDF', async () => {
+    const { default: Resume } = await import('./Resume');
+    const { screen } = await import('@testing-library/react');
+    render(<Resume />);
+    expect(screen.getByRole('heading', { level: 2, name: 'Resume' })).toBeInTheDocument();
+    expect(screen.getByAltText(/Resume of Mario Feng Wu/)).toHaveAttribute('src', '/resume-preview.png');
+    const download = screen.getByRole('link', { name: /download pdf/ });
+    expect(download).toHaveAttribute('href', '/Mario_Feng_Wu_Resume.pdf');
+    expect(download).toHaveAttribute('download', 'Mario_Feng_Wu_Resume.pdf');
+    expect(screen.getByRole('link', { name: /open in a new tab/ })).toHaveAttribute('target', '_blank');
+  });
+});
