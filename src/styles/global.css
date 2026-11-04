@@ -277,16 +277,7 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 /* Scrollytelling: the steps scroll over the page nebula, which re-forms per step. */
 .stages, .exp-section { position: relative; }
 .stage-pipeline pre { color: var(--ink-faint); }
-.stage-steps {
-  position: relative; z-index: 1;
-  width: min(46%, 520px); margin-left: auto;
-}
 
-.stage-step {
-  min-height: calc(62vh / var(--zoom)); display: flex; flex-direction: column; justify-content: center; gap: 12px;
-  padding: 32px 0;
-  color: var(--ink-faint); transition: color .7s var(--ease); /* matches MORPH_S */
-}
 .stage-step.is-active { color: var(--ink); }
 .stage-step-title { font: 400 clamp(2.2rem, 4.6vw, 4rem)/1 var(--display); text-transform: uppercase; }
 .stage-step-desc { max-width: 46ch; font-size: var(--fs-base); }
@@ -471,8 +462,6 @@ section, .contact { padding: clamp(72px, 10vw, 120px) 0; }
 /* --------------------------------------------------------- responsive --- */
 @media (max-width: 1080px) { .scroll-meter { display: none; } .theme-toggle { margin-left: auto; } }
 @media (max-width: 860px) {
-  .stage-steps { width: 100%; }
-  .stage-step { min-height: 70svh; }
   .nav-toggle { display: block; }
   /* Menu drops in (opacity + small translate), items follow with a 40ms stagger.
      visibility keeps closed links out of the tab order without display:none. */
@@ -635,7 +624,6 @@ main { position: relative; z-index: 1; }
 .hero-content > * { position: relative; }
 
 /* ------------------------------------------------------------ polish --- */
-.stage-step:first-child { min-height: 0; padding-top: 8px; }
 .hero-proof { margin-top: 10px; color: var(--ink-dim); font-size: var(--fs-sm); }
 .btn-quiet { border-color: transparent; color: var(--ink-dim); }
 .motion-toggle, .contact-copy-btn { background: none; border: 0; padding: 0; cursor: pointer; }
@@ -720,26 +708,57 @@ main { position: relative; z-index: 1; }
 .project-context { margin-top: 10px; }
 .section-head { margin-bottom: 40px; }
 
-/* ------------------------------------------------------------ resume --- */
-/* The resume as a sheet lying in the nebula: the page preview on the left,
-   what it is and how to get it on the right. */
+
 .section-head h2, .contact-title { display: inline-block; }
-.resume-body {
-  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  gap: 32px clamp(32px, 6vw, 80px); align-items: start;
+
+/* -------------------------------------------- expertise: horizontal --- */
+/* The section pins for (steps x one screen) of scroll; vertical scroll slides
+   the steps sideways (Expertise.jsx writes translateX). The next step peeks in
+   from the right so the direction of travel is obvious. */
+.stage-pin { position: relative; height: calc(var(--steps, 3) * 100svh / var(--zoom)); }
+.stage-viewport {
+  position: sticky; top: 0; height: calc(100svh / var(--zoom));
+  display: flex; flex-direction: column; justify-content: center; gap: 28px;
+  overflow: hidden;
+  /* Full bleed: steps enter and leave at the screen edge, not the column edge.
+     Viewport units are divided by --zoom because the page is zoomed. */
+  --bleed: calc(100vw / var(--zoom));
+  width: var(--bleed); margin-left: calc(50% - var(--bleed) / 2);
+  padding-inline: max(var(--gutter), calc((var(--bleed) - var(--max)) / 2 + var(--gutter)));
 }
-.resume-sheet {
-  display: block; background: #fff; box-shadow: 0 24px 60px -24px rgba(0, 0, 0, .7);
-  transition: transform var(--dur-state) var(--ease);
+.stage-steps {
+  display: flex; gap: clamp(32px, 6vw, 96px);
+  will-change: transform;
 }
-.resume-sheet img { display: block; width: 100%; height: auto; }
-@media (hover: hover) and (pointer: fine) { .resume-sheet:hover { transform: translateY(-4px); } }
-.resume-sheet:active { transform: scale(.99); }
-.resume-side { display: grid; gap: 20px; align-content: start; position: sticky; top: calc(var(--nav-h) + 32px); }
-.resume-note { max-width: 40ch; font-size: var(--fs-base); }
-.resume-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.resume-meta { color: var(--ink-faint); font-size: var(--fs-xs); }
+.stage-step {
+  flex: 0 0 min(68%, 640px);
+  display: flex; flex-direction: column; gap: 14px;
+  color: var(--ink-faint); transition: color .7s var(--ease); /* matches MORPH_S */
+}
+.stage-progress { display: flex; gap: 2ch; align-items: baseline; width: fit-content; font-size: var(--fs-xs); }
+.stage-progress-node { color: var(--accent); }
 @media (max-width: 860px) {
-  .resume-body { grid-template-columns: 1fr; }
-  .resume-side { position: static; order: -1; }
+  .stage-step { flex-basis: 86%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-pin { height: auto; }
+  .stage-viewport { position: static; height: auto; overflow: visible; }
+  .stage-steps { flex-direction: column; transform: none !important; gap: 56px; }
+  .stage-progress { display: none; }
+}
+
+/* -------------------------------------------------- nebula progress --- */
+.nebula-bar { white-space: pre; font-variant-ligatures: none; font-feature-settings: "calt" 0, "liga" 0; }
+.nebula-bar-edge { color: var(--ink-faint); }
+.nebula-bar-dust { color: var(--neb-dust); }
+.nebula-bar-gas { color: var(--neb-blue); }
+.nebula-bar-head { color: var(--neb-core); text-shadow: 0 0 6px var(--neb-glow); }
+.nebula-bar-percent { margin-left: 1ch; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+
+/* -------------------------------------------- text size at 75% scale --- */
+/* The page renders at 75% on wide screens for the ASCII; the copy is set a
+   step larger there so it still reads comfortably. Cells keep their size. */
+@media (min-width: 1100px) {
+  :root { --fs-xs: .86rem; --fs-sm: .98rem; --fs-base: 1.1rem; --fs-lg: 1.2rem; }
+  body { font-size: 17px; }
 }

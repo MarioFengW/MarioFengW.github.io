@@ -11,7 +11,7 @@ const STEP_MS = 40;
  * Screen readers always get the real text; the animated copy is aria-hidden.
  * Server-rendered output is the final text, so no-JS visitors see it normally.
  */
-export default function ScrambleText({ text, as: Tag = 'span', className, immediate = false }) {
+export default function ScrambleText({ text, as: Tag = 'span', className, immediate = false, ...rest }) {
   const visualRef = useRef(null);
   const reducedMotion = useReducedMotion();
 
@@ -70,7 +70,7 @@ export default function ScrambleText({ text, as: Tag = 'span', className, immedi
   }, [text, reducedMotion, immediate]);
 
   return (
-    <Tag className={className}>
+    <Tag className={className} {...rest}>
       <span className="sr-only">{text}</span>
       <span ref={visualRef} aria-hidden="true">{text}</span>
     </Tag>

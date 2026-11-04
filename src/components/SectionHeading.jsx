@@ -1,14 +1,15 @@
 import React from 'react';
+import ScrambleText from './ScrambleText';
 
 /**
- * Section heading. The page nebula opens a clearing around the words only
- * (inline-block), so no full-width empty band cuts the background. No rule
- * under it and no eyebrow above it: the heading carries itself.
+ * Section heading: the title decodes from glyphs the first time it is seen
+ * (the real text is always there for assistive tech). The page nebula opens a
+ * clearing around the words only, so no full-width band cuts the background.
  */
 export default function SectionHeading({ title }) {
   return (
     <header className="section-head">
-      <h2 data-clearing="">{title}</h2>
+      <ScrambleText as="h2" text={title} data-clearing="" />
     </header>
   );
 }

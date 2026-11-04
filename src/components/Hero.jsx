@@ -37,9 +37,9 @@ export default function Hero() {
             <span aria-hidden="true">&gt;</span>
             <span>email me</span>
           </a>
-          <a className="btn btn-quiet" href="#resume">
+          <a className="btn btn-quiet" href={profile.resume} target="_blank" rel="noopener noreferrer">
             <span>resume</span>
-            <span aria-hidden="true">↓</span>
+            <span aria-hidden="true">↗</span>
           </a>
         </div>
         <p className="hero-status" data-clearing="">

@@ -1,22 +1,23 @@
-import React, { useEffect, useRef } from 'react';
-import { asciiProgress } from '../lib/ascii';
+import React, { useEffect, useState } from 'react';
+import NebulaBar from './NebulaBar';
 
 const WIDTH = 16;
+const STEPS = 64; // re-render only when the bar visibly changes
 
 export function scrollProgress() {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   return max > 0 ? window.scrollY / max : 0;
 }
 
-/** Page scroll progress drawn as `[######..........]  37%`. Decorative only. */
+/** Page scroll progress drawn as nebula gas filling the bar. Decorative only. */
 export default function ScrollMeter() {
-  const ref = useRef(null);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     let rafId = 0;
     const update = () => {
       rafId = 0;
-      if (ref.current) ref.current.textContent = asciiProgress(scrollProgress(), WIDTH);
+      setProgress(Math.round(scrollProgress() * STEPS) / STEPS);
     };
     const schedule = () => {
       if (!rafId) rafId = requestAnimationFrame(update);
@@ -31,9 +32,5 @@ export default function ScrollMeter() {
     };
   }, []);
 
-  return (
-    <span ref={ref} className="scroll-meter" aria-hidden="true">
-      {asciiProgress(0, WIDTH)}
-    </span>
-  );
+  return <NebulaBar className="scroll-meter" progress={progress} width={WIDTH} />;
 }

@@ -6,6 +6,7 @@ import useReducedMotion from '../hooks/useReducedMotion';
 import useNebulaFocus from '../hooks/useNebulaFocus';
 import { broadcast } from '../lib/stages';
 import AsciiFlow from './AsciiFlow';
+import ScrambleText from './ScrambleText';
 
 // Secondary channels: everything except email (the composer covers it), plus the resume.
 export const CHANNELS = [
@@ -78,7 +79,7 @@ export default function Footer() {
   return (
     <footer id="contact" className="contact">
       {/* Headline font (Pixelta) has no apostrophe glyph, so keep display copy apostrophe-free. */}
-      <h2 className="contact-title" data-clearing="">Get in touch</h2>
+      <ScrambleText as="h2" className="contact-title" text="Get in touch" data-clearing="" />
       <p className="contact-copy" data-clearing="">
         Open to internships, research collaborations and freelance work in AI/ML, full-stack development and DevOps.
       </p>
