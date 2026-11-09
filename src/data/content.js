@@ -66,7 +66,7 @@ export const experience = [
     period: 'Jan 2026 - Ongoing',
     title: 'Research Project',
     organization: 'Tecnológico de Monterrey',
-    location: 'Hybrid',
+    location: 'Remote',
     link: 'https://nextgenscientist.mx/',
     linkLabel: 'nextgenscientist.mx',
     metric: '82.56% F1-Macro',
@@ -151,7 +151,7 @@ export const projects = [
   },
   {
     title: 'Hack2Dawn',
-    period: 'Feb 2025 - May 2025',
+    period: 'Feb 2026 - May 2026',
     context: 'PawnGuard Capture The Flag',
     description: "Built the website for PawnGuard's Capture The Flag competition, where players solve web exploitation, reverse engineering and cryptography challenges.",
     stack: ['React', 'Next.js', 'TailwindCSS', 'TypeScript'],
