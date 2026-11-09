@@ -64,8 +64,8 @@ export const expertise = [
 export const experience = [
   {
     period: 'Jan 2026 - Ongoing',
-    title: 'Next-Gen Scientist - Research Project',
-    organization: 'ITESM',
+    title: 'Research Project',
+    organization: 'Tecnológico de Monterrey',
     location: 'Hybrid',
     link: 'https://nextgenscientist.mx/',
     linkLabel: 'nextgenscientist.mx',
@@ -73,6 +73,14 @@ export const experience = [
     shape: 'three views merging into one prediction',
     description: 'MultiView Stacking for IoT intrusion detection on CIC IoT-DIAD 2024: four semantic feature views, one Random Forest each, learned combination. Beats the single-model baseline in all 20 paired partitions (82.56% vs 80.79% F1-Macro, 90.18% accuracy), with ablations and LightGBM/stacking controls. Preparing an IEEE IoT Journal submission.',
     stack: ['Python', 'Scikit-learn', 'Random Forest', 'SMOTE'],
+  },
+  {
+    period: 'Dec 2025 - Mar 2026',
+    title: 'NextGen University Program Trainee',
+    organization: 'EPAM Systems',
+    shape: 'containers rolling out, one pipeline run at a time',
+    description: 'Four-month, mentor-led Cloud & DevOps training program: Linux administration and Bash/Python scripting, containerized applications with Docker, and CI/CD pipelines built with Jenkins, GitHub and GitLab, plus software development methodologies in team exercises.',
+    stack: ['Linux', 'Bash', 'Python', 'Docker', 'Jenkins', 'CI/CD'],
   },
   {
     period: 'Nov 2024 - May 2025',
@@ -88,14 +96,12 @@ export const experience = [
   },
   {
     period: 'Sep 2024 - Nov 2024',
-    title: 'Research Project - Rochin MX',
-    organization: 'ITESM',
+    title: 'Research Project',
+    organization: 'Tecnológico de Monterrey',
     location: 'Remote',
-    link: 'https://industriasrochin.com/en/',
-    linkLabel: 'industriasrochin.com',
     metric: '90% detection',
     shape: 'detecting fruit, one box at a time',
-    description: 'Real-time defect detection for fresh tomatoes using Mask R-CNN, reaching a 90% detection rate in quality control tests.',
+    description: 'Real-time defect detection for fresh tomatoes using Mask R-CNN, reaching a 90% detection rate in quality control tests, in research led by Dr. Saul Cuen Rochin. Annotated and augmented 250+ tomato images for training.',
     stack: ['Python', 'Mask R-CNN', 'Google Colab'],
   },
 ];

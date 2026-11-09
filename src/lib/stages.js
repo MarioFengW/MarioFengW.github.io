@@ -162,7 +162,7 @@ export function detection(cols, rows, t) {
   };
 }
 
-export const EXPERIENCE_SHAPES = [streams, broadcast, detection];
+export const EXPERIENCE_SHAPES = [streams, containers, broadcast, detection];
 
 // ------------------------------------------------------------ whole page
 // Shapes for the sections that are not a list of stages.

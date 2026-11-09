@@ -53,15 +53,20 @@ describe('Experience nebula focus', () => {
     const { container } = render(<Experience />);
     setActiveSection('experience');
     const caption = () => getFocus().label;
-    expect(caption()).toContain('itesm');
+    expect(caption()).toContain('tecnológico de monterrey');
     const items = container.querySelectorAll('.exp-item');
     act(() => {
       fireEvent.pointerEnter(items[1]);
     });
-    expect(caption()).toContain('amco');
+    expect(caption()).toContain('epam');
     act(() => {
       fireEvent.pointerLeave(items[1]);
+      fireEvent.pointerEnter(items[2]);
     });
-    expect(caption()).toContain('itesm');
+    expect(caption()).toContain('amco');
+    act(() => {
+      fireEvent.pointerLeave(items[2]);
+    });
+    expect(caption()).toContain('tecnológico de monterrey');
   });
 });
