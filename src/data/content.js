@@ -71,7 +71,7 @@ export const experience = [
     linkLabel: 'nextgenscientist.mx',
     metric: '82.56% F1-Macro',
     shape: 'three views merging into one prediction',
-    description: 'MultiView Stacking for IoT intrusion detection on CIC IoT-DIAD 2024: four semantic feature views, one Random Forest each, learned combination. Beats the single-model baseline in all 20 paired partitions (82.56% vs 80.79% F1-Macro, 90.18% accuracy), with ablations and LightGBM/stacking controls. Preparing an IEEE IoT Journal submission.',
+    description: 'MultiView Stacking for IoT intrusion detection on CIC IoT-DIAD 2024: four semantic feature views, one Random Forest each, learned combination. Beats the single-model baseline in all 20 paired partitions (82.56% vs 80.79% F1-Macro, 90.18% accuracy), with ablations and LightGBM/stacking controls. Preparing a paper for a journal.',
     stack: ['Python', 'Scikit-learn', 'Random Forest', 'SMOTE'],
   },
   {
